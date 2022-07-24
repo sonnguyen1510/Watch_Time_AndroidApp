@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingTop="?attr/actionBarSize">
+
+
+    <TextView
+        android:id="@+id/Time_hour"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="11"
+        android:textAlignment="center"
+        android:textColor="#FF0101"
+        android:textSize="120dp" />
+
+    <TextView
+        android:id="@+id/Time_Minute"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="59"
+        android:textSize="90dp"
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/Time_Second"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:text="59"
+        android:textSize="90dp"
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/Time_MiliSecond"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="999"
+        android:textSize="40dp"
+
+        android:textAlignment="center" />
+
+    <Button
+        android:id="@+id/Time_GetTime"
+        android:layout_margin="30dp"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GET TIME" />
+</LinearLayout>
