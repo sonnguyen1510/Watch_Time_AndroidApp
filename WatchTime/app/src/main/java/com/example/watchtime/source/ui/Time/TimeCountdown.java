@@ -1,4 +1,4 @@
-package com.example.watchtime.ui.Time;
+package com.example.watchtime.source.ui.Time;
 
 import android.app.Service;
 import android.content.Intent;
@@ -10,7 +10,7 @@ public class TimeCountdown extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        
+
     }
 
     @Override

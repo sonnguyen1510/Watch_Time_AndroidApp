@@ -1,10 +1,9 @@
-package com.example.watchtime.TimeAPI.APIService;
+package com.example.watchtime.source.TimeAPI.APIService;
 
-import com.example.watchtime.Object.Time;
+import com.example.watchtime.source.Object.Time;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface APIInterface {

@@ -1,4 +1,4 @@
-package com.example.watchtime.ui.Time;
+package com.example.watchtime.source.ui.Time;
 
 import android.app.Application;
 import android.app.NotificationChannel;

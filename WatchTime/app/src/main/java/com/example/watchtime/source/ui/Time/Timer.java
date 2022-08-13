@@ -1,14 +1,15 @@
-package com.example.watchtime.ui.Time;
+package com.example.watchtime.source.ui.Time;
 
+import static com.example.watchtime.resouce.global_variable.World_Clock_activity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.watchtime.Object.Time;
 import com.example.watchtime.R;
 
 public class Timer extends AppCompatActivity {
@@ -35,7 +36,7 @@ public class Timer extends AppCompatActivity {
         Timer.setImageResource(R.drawable.ic_baseline_timer_red);
         Timer.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v){
 
             }
         });
@@ -45,7 +46,7 @@ public class Timer extends AppCompatActivity {
         World_Clock .setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                startActivity(new Intent(v.getContext(),World_Clock_activity));
             }
         });
 
@@ -54,7 +55,7 @@ public class Timer extends AppCompatActivity {
         Alarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                startActivity(new Intent(v.getContext(),World_Clock_activity));
             }
         });
 

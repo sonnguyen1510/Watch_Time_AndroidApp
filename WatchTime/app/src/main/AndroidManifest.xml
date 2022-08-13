@@ -9,14 +9,14 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".ui.Time.Timer_Notification"
+        android:name=".source.ui.Time.Timer_Notification"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WatchTime"
         tools:targetApi="31">
-        <service android:name=".ui.Time.TimeCountdown" />
+        <service android:name=".source.ui.Time.TimeCountdown" />
         <activity
-            android:name=".ui.world_clock.world_clock"
+            android:name=".source.ui.world_clock.world_clock"
             android:exported="true"
             android:label="@string/app_name">
             <intent-filter>

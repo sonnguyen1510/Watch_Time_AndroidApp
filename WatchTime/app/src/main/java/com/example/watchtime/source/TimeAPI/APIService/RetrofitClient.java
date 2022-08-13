@@ -1,4 +1,4 @@
-package com.example.watchtime.TimeAPI.APIService;
+package com.example.watchtime.source.TimeAPI.APIService;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
