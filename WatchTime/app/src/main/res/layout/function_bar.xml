@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+
+    >
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight=".33"
+
+        >
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            >
+            <ImageView
+                android:id="@+id/world_clock_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+
+                android:layout_gravity="center"
+                android:src="@drawable/ic_baseline_world">
+
+            </ImageView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="World Clock"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                android:textAllCaps="false"
+                android:layout_gravity="center"
+
+                >
+
+            </TextView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight=".33"
+        >
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            >
+            <ImageView
+                android:id="@+id/alarm_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+
+
+                android:layout_gravity="center"
+                android:src="@drawable/ic_baseline_alarm">
+
+            </ImageView>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Alarm"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                android:textAllCaps="false"
+                android:layout_gravity="center"
+
+                >
+
+            </TextView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight=".33"
+        >
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            >
+
+            <ImageView
+                android:id="@+id/Timer_button"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+
+
+                android:layout_gravity="center"
+                android:src="@drawable/ic_baseline_timer">
+
+            </ImageView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Timer"
+                android:textAllCaps="false"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+
+                >
+
+            </TextView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
