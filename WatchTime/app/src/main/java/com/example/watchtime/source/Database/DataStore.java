@@ -9,11 +9,18 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-import com.example.watchtime.source.Database.Timer.TimeCountdownQuery;
+import com.example.watchtime.source.Database.Alarm.alarmList;
+import com.example.watchtime.source.Database.Alarm.alarmListQuery;
+import com.example.watchtime.source.Database.Timer.timeCountdown;
+import com.example.watchtime.source.Database.Timer.timeCountdownQuery;
+import com.example.watchtime.source.Database.WorldClock.worldClockList;
+import com.example.watchtime.source.Database.WorldClock.worldClockListQuery;
 import com.example.watchtime.source.ui.Time.TimeCountdown;
 
 @Database(entities = {
-        TimeCountdown.class
+        timeCountdown.class,
+        alarmList.class,
+        worldClockList.class
 },version = Database_Version)
 public abstract class DataStore extends RoomDatabase {
     private static final String DATABASE_NAME = "ClockAPP";
@@ -29,5 +36,7 @@ public abstract class DataStore extends RoomDatabase {
         return instance;
     }
 
-    public abstract TimeCountdownQuery timeCountdownQuery();
+    public abstract timeCountdownQuery timeCountdownQuery();
+    public abstract alarmListQuery alarmListQuery();
+    public abstract worldClockListQuery worldClockListQuery();
 }

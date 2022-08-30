@@ -1,6 +1,6 @@
 package com.example.watchtime.source.TimeAPI.APIService;
 
-import com.example.watchtime.source.Object.Time;
+import com.example.watchtime.resouce.Object.Time;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

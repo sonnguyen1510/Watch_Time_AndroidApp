@@ -3,19 +3,19 @@ package com.example.watchtime.source.Database.Timer;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.Update;
+
 
 @Dao
-public interface TimeCountdownQuery {
+public interface timeCountdownQuery {
     @Insert
-    void storeTimeLeft(TimeCountdown timeCountdown);
+    void storeTimeLeft(timeCountdown timeCountdown);
 
-    @Query("Select * from TimeCountdown where ID = :ID")
-    TimeCountdown getTimeLeft(int ID);
+    @Query("Select * from timeCountdown where ID=:ID")
+    timeCountdown getTimeLeft(int ID);
 
-    @Query("Update TimeCountdown set timeLeft = :Timeleft where ID = :ID")
+    @Query("Update timeCountdown set timeLeft = :Timeleft where ID = :ID")
     void updateTimeLeft(int Timeleft , int ID);
 
-    @Query("Delete from TimeCountdown where ID = :ID")
+    @Query("Delete from timeCountdown where ID = :ID")
     void deleteTimeLeft(int ID );
 }

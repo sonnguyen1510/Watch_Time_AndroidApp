@@ -1,5 +1,6 @@
 package com.example.watchtime.resouce;
 
+import com.example.watchtime.Test_class;
 import com.example.watchtime.source.ui.Time.Timer;
 import com.example.watchtime.source.ui.world_clock.world_clock;
 
@@ -13,6 +14,7 @@ public class global_variable {
     public static final Class Timer_activity = Timer.class;
     public static final Class Alarm_activity = Timer.class;
     public static final Class World_Clock_activity = world_clock.class;
+    public static final Class Test_class = Test_class.class;
     /**
      *
      -----------------------VARIABLE----------------------------
@@ -25,4 +27,13 @@ public class global_variable {
      */
     //Database version:
     public static final int Database_Version = 1;
+
+    /**
+     *
+     --------------------------TIMER----------------------------
+     */
+    public static final int TimerID = 123456;
+    /**
+     * @param TimerID timer using 1 ID only to control all of them
+     */
 }

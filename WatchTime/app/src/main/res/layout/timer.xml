@@ -18,11 +18,13 @@
             >
 
             <ProgressBar
-                android:id="@+id/progressBar"
-                style="?android:attr/progressBarStyle"
+                android:id="@+id/PercentageOfTimeLeft"
+                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="394dp"
                 android:layout_height="376dp"
                 android:visibility="gone"
+                android:progress="100"
+                android:progressDrawable="@drawable/time_progress"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.49"
@@ -76,6 +78,51 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.856"
                 tools:text="Cancel" />
+
+            <EditText
+                android:id="@+id/inputTime"
+                android:layout_width="245dp"
+                android:layout_height="95dp"
+                android:ems="10"
+                android:inputType="time"
+                android:text="00:00:00"
+                android:editable="false"
+                android:focusable="false"
+                android:textAlignment="center"
+                android:textSize="50dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toTopOf="@+id/start_timer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.567" />
+
+            <LinearLayout
+                android:id="@+id/timeSetting"
+                android:layout_width="231dp"
+                android:layout_height="182dp"
+                android:orientation="horizontal"
+
+                app:layout_constraintBottom_toTopOf="@+id/start_timer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.45">
+
+                <include layout="@layout/time_picker_widget"></include>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/ShowTimeLeft"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00:00"
+                android:textSize="50dp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/PercentageOfTimeLeft"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/PercentageOfTimeLeft" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout

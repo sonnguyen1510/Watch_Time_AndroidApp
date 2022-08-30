@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.watchtime.source.Object.Time;
+import com.example.watchtime.resouce.Object.Time;
 import com.example.watchtime.R;
 import com.example.watchtime.source.TimeAPI.APICall.Time_APICall;
 

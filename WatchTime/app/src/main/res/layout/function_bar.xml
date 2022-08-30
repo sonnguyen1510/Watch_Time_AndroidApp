@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
 
 
+
     >
     <LinearLayout
         android:layout_width="0dp"
@@ -16,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_marginBottom="5dp"
             >
             <ImageView
                 android:id="@+id/world_clock_button"
@@ -30,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="World Clock"
-                android:textSize="15dp"
+                android:textSize="12dp"
                 android:textStyle="bold"
                 android:textAllCaps="false"
                 android:layout_gravity="center"
@@ -52,6 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_marginBottom="5dp"
             >
             <ImageView
                 android:id="@+id/alarm_button"
@@ -67,7 +70,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="Alarm"
-                android:textSize="15dp"
+                android:textSize="12dp"
                 android:textStyle="bold"
                 android:textAllCaps="false"
                 android:layout_gravity="center"
@@ -89,6 +92,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
+            android:layout_marginBottom="5dp"
             >
 
             <ImageView
@@ -107,7 +111,7 @@
                 android:layout_height="match_parent"
                 android:text="Timer"
                 android:textAllCaps="false"
-                android:textSize="15dp"
+                android:textSize="12dp"
                 android:textStyle="bold"
                 android:layout_gravity="center"
 

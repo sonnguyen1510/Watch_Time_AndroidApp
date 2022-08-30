@@ -1,6 +1,6 @@
 package com.example.watchtime.source.TimeAPI.APICall;
 
-import com.example.watchtime.source.Object.Time;
+import com.example.watchtime.resouce.Object.Time;
 import com.example.watchtime.source.TimeAPI.APIService.APIInterface;
 import com.example.watchtime.source.TimeAPI.APIService.RetrofitClient;
 
