@@ -41,16 +41,13 @@ public class Timer extends AppCompatActivity implements Serializable {
     public ImageView Timer ;
     public ImageView World_Clock;
     public ImageView Alarm;
-    public boolean isRegistered = false;
     /**
      *********************************TIMER****************************
      */
     public Button start_timer;
     public Button cancel_timer;
 
-    public TimeCountdown countdown;
-    public EditText inputTime;
-    public Context context = this;
+
     public Timer_data data ;
     public ProgressBar PercentTimeLeft;
     public TextView ShowTimeLeft;
@@ -263,6 +260,7 @@ public class Timer extends AppCompatActivity implements Serializable {
 
         
     }
+
     private void startTimerLayoutChange() {
         start_timer.setVisibility(View.GONE);
 
@@ -329,7 +327,6 @@ public class Timer extends AppCompatActivity implements Serializable {
     private void stopTimer() {
         //DataStore.getInstance(this).timeCountdownQuery().deleteTimeLeft(data.getData().getID());
         stopTimerLayoutChange();
-        isRegistered = false;
         stopService(new Intent(this,global_variable.TimerService));
     }
 
