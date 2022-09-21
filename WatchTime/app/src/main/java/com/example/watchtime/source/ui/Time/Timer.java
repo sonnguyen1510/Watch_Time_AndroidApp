@@ -2,9 +2,11 @@ package com.example.watchtime.source.ui.Time;
 
 import static com.example.watchtime.resouce.global_variable.World_Clock_activity;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -21,6 +23,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.watchtime.R;
 import com.example.watchtime.resouce.function;
@@ -38,6 +41,7 @@ public class Timer extends AppCompatActivity implements Serializable {
     public ImageView Timer ;
     public ImageView World_Clock;
     public ImageView Alarm;
+    public boolean isRegistered = false;
     /**
      *********************************TIMER****************************
      */
@@ -64,6 +68,26 @@ public class Timer extends AppCompatActivity implements Serializable {
     /**
      *********************************CONNECT TO SERVICE ****************************
      */
+    //Use to get time data from service
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String datatime = intent.getStringExtra(global_variable.BroadcaseIntentName);
+
+            //timeCountdown timeCountdown= DataStore.getInstance(Timer.this).timeCountdownQuery().getTimeLeft(global_variable.TimerID);
+            //data = new Timer_data(timeCountdown);
+            //int[] time = function.Timer.getTime(timeCountdown.getTimeLeft());
+
+            //data.second = time[2];
+            //data.minute = time[1];
+            //data.hour = time[0];
+            startTimerLayoutChange();
+            ShowTimeLeft.setText(datatime);
+
+        }
+    };
+
+
 
 
     public static final NumberPicker.Formatter TWO_DIGIT_FORMATTER =
@@ -76,6 +100,13 @@ public class Timer extends AppCompatActivity implements Serializable {
                 }
             };
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.example.watchtime.source.ui.Time");
+        registerReceiver(broadcastReceiver, intentFilter);
+    }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,19 +156,22 @@ public class Timer extends AppCompatActivity implements Serializable {
         ShowTimeLeft = findViewById(R.id.ShowTimeLeft);
         PercentTimeLeft = findViewById(R.id.PercentageOfTimeLeft);
 
-        if(DataStore.getInstance(this).timeCountdownQuery().getTimeLeft(global_variable.TimerID)!=null){
-            timeCountdown timeCountdown= DataStore.getInstance(Timer.this).timeCountdownQuery().getTimeLeft(global_variable.TimerID);
-            data = new Timer_data(timeCountdown);
-            int[] time = function.Timer.getTime(timeCountdown.getTimeLeft());
-            data.second = time[2];
-            data.minute = time[1];
-            data.hour = time[0];
+        /**
+         if(DataStore.getInstance(this).timeCountdownQuery().getTimeLeft(global_variable.TimerID)!=null){
+         timeCountdown timeCountdown= DataStore.getInstance(Timer.this).timeCountdownQuery().getTimeLeft(global_variable.TimerID);
+         data = new Timer_data(timeCountdown);
+         int[] time = function.Timer.getTime(timeCountdown.getTimeLeft());
+         data.second = time[2];
+         data.minute = time[1];
+         data.hour = time[0];
 
-            startTimerLayoutChange();
-            onCountdown();
+         startTimerLayoutChange();
+         onCountdown();
 
 
-        }
+         }
+         */
+
 
         //------------------------------TIME PICKER--------------------
 
@@ -203,25 +237,15 @@ public class Timer extends AppCompatActivity implements Serializable {
                 int seconds = mCurrentSeconds;
 
                 int totalTime =  toMilisecond(hours,minutes,seconds);
-                Log.e("Time",totalTime+"");
-
-                //-----------------------CREATE TIMER DATA----------------------
-
                 timeCountdown timeCountdown =new timeCountdown(global_variable.TimerID,totalTime,totalTime);
                 data = new Timer_data(timeCountdown);
 
                 data.hour = mCurrentHour;
                 data.minute = mCurrentMinute;
                 data.second = mCurrentSeconds;
-
-                //---------------
-                if(DataStore.getInstance(Timer.this).timeCountdownQuery().getTimeLeft(global_variable.TimerID)!= null){
-                    DataStore.getInstance(v.getContext()).timeCountdownQuery().deleteTimeLeft(global_variable.TimerID);
-                };
-                DataStore.getInstance(v.getContext()).timeCountdownQuery().storeTimeLeft(timeCountdown);
-
+                
                 startTimer();
-                onCountdown();
+                //onCountdown();
             }
 
 
@@ -259,24 +283,6 @@ public class Timer extends AppCompatActivity implements Serializable {
         ShowTimeLeft.setVisibility(View.GONE);
     }
 
-    private void onCountdown(){
-        data.getData().setTimeLeft( data.getData().getTimeLeft()-1000);
-        data.CountDown();
-
-        new CountDownTimer(data.getData().getTimeLeft(), 1000) {
-            public void onTick(long millisUntilFinished) {
-                //Log.e("In service",""+data.second);
-                PercentTimeLeft.setProgress(data.getData().getTotalTime()/data.getData().getTimeLeft()*100);
-                ShowTimeLeft.setText(function.Timer.FormatTime(data));
-                data.CountDown();
-            }
-
-            public void onFinish() {
-
-            }
-
-        }.start();
-    }
 
     private void setCurrentSecond(int currentSecond) {
         this.mCurrentSeconds = currentSecond;
@@ -321,15 +327,20 @@ public class Timer extends AppCompatActivity implements Serializable {
     }
 
     private void stopTimer() {
-        DataStore.getInstance(this).timeCountdownQuery().deleteTimeLeft(data.getData().getID());
+        //DataStore.getInstance(this).timeCountdownQuery().deleteTimeLeft(data.getData().getID());
         stopTimerLayoutChange();
-        stopService(new Intent(this,TimeCountdown.class));
+        isRegistered = false;
+        stopService(new Intent(this,global_variable.TimerService));
+    }
 
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(broadcastReceiver);
     }
 
     private void startTimer() {
-        Intent startTimer =new Intent(this,TimeCountdown.class );
+        Intent startTimer =new Intent(this,global_variable.TimerService);
         //Send time data
         Log.e("",data.getData().getTotalTime()+"");
         startTimer.putExtra("Timer_data", (Serializable) data);
