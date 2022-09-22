@@ -13,6 +13,9 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,10 +32,15 @@ import com.example.watchtime.R;
 import com.example.watchtime.resouce.function;
 import com.example.watchtime.resouce.global_variable;
 import com.example.watchtime.source.Database.DataStore;
+import com.example.watchtime.source.Database.Timer.AlertSong;
+import com.example.watchtime.source.Database.Timer.AlertSongQuery;
 import com.example.watchtime.source.Database.Timer.timeCountdown;
 import com.example.watchtime.resouce.Object.Timer_data;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Timer extends AppCompatActivity implements Serializable {
     /**
@@ -52,6 +60,14 @@ public class Timer extends AppCompatActivity implements Serializable {
     public ProgressBar PercentTimeLeft;
     public TextView ShowTimeLeft;
 
+    //Alert song
+    public TextInputLayout alertsong;
+    public AutoCompleteTextView alertsongChoosed;
+    public List<String> ListSong;
+    public ArrayAdapter<String> alertsongAdapter;
+    public int DefaultSong;
+
+    //time
     public LinearLayout timeSetting;
     public NumberPicker mHourPicker;
     public NumberPicker mMinutePicker;
@@ -84,9 +100,6 @@ public class Timer extends AppCompatActivity implements Serializable {
         }
     };
 
-
-
-
     public static final NumberPicker.Formatter TWO_DIGIT_FORMATTER =
             new NumberPicker.Formatter() {
 
@@ -97,6 +110,7 @@ public class Timer extends AppCompatActivity implements Serializable {
                 }
             };
 
+    /**---------------------------------------------ACTIVITY--------------------------------------*/
     @Override
     protected void onStart() {
         super.onStart();
@@ -153,31 +167,14 @@ public class Timer extends AppCompatActivity implements Serializable {
         ShowTimeLeft = findViewById(R.id.ShowTimeLeft);
         PercentTimeLeft = findViewById(R.id.PercentageOfTimeLeft);
 
-        /**
-         if(DataStore.getInstance(this).timeCountdownQuery().getTimeLeft(global_variable.TimerID)!=null){
-         timeCountdown timeCountdown= DataStore.getInstance(Timer.this).timeCountdownQuery().getTimeLeft(global_variable.TimerID);
-         data = new Timer_data(timeCountdown);
-         int[] time = function.Timer.getTime(timeCountdown.getTimeLeft());
-         data.second = time[2];
-         data.minute = time[1];
-         data.hour = time[0];
-
-         startTimerLayoutChange();
-         onCountdown();
-
-
-         }
-         */
-
-
         //------------------------------TIME PICKER--------------------
 
         mHourPicker= findViewById(R.id.hour);
         mMinutePicker= findViewById(R.id.minute);
         mSecondPicker= findViewById(R.id.seconds);
 
-        setCurrentHour(0);//cal.get(Calendar.HOUR_OF_DAY)
-        setCurrentMinute(0);//cal.get(Calendar.MINUTE)
+        setCurrentHour(0);
+        setCurrentMinute(0);
         setCurrentSecond(0);
 
         // hour
@@ -216,10 +213,40 @@ public class Timer extends AppCompatActivity implements Serializable {
                 mCurrentSeconds = newVal;
             }
         });
+        //------------------------------ALERT--------------------------
+        //-----FIRST USING APP ------------
+        if(DataStore.getInstance(this).alertSongQuery().getAllAlertsong().isEmpty()){
+            List<AlertSong> CreateFristListSong = new ArrayList<>();
+            CreateFristListSong.add(new AlertSong("Radar",R.raw.radar));
+            CreateFristListSong.add(new AlertSong("Apex",R.raw.apex));
 
+            for (AlertSong data:CreateFristListSong) {
+                DataStore.getInstance(this).alertSongQuery().insertAlertSong(data);
+            }
+        }
+        //-----SET DEFAULT ------------
+        DefaultSong = R.raw.radar;
+
+        //-----SETUP DROPDOWN ALERT SONG MENU--------------
+        alertsong = findViewById(R.id.choose_alert_song);
+        alertsongChoosed = findViewById(R.id.alertsong_choosed);
+        ListSong = DataStore.getInstance(this).alertSongQuery().getAllAlertsong();
+
+        alertsongAdapter = new ArrayAdapter<>(this,R.layout.alertsong_dropdownitem,ListSong);
+        alertsongChoosed.setAdapter(alertsongAdapter);
+        alertsongChoosed.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String item = parent.getItemAtPosition(position).toString();
+                try {
+                    DefaultSong = DataStore.getInstance(view.getContext()).alertSongQuery().getAlertSong(item);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
 
         //-------------------------------BUTTON-------------------------
-
 
         start_timer = findViewById(R.id.start_timer);
         start_timer.setOnClickListener(new View.OnClickListener() {
@@ -233,14 +260,15 @@ public class Timer extends AppCompatActivity implements Serializable {
                 int minutes = mCurrentMinute;
                 int seconds = mCurrentSeconds;
 
-                int totalTime =  toMilisecond(hours,minutes,seconds);
-                timeCountdown timeCountdown =new timeCountdown(global_variable.TimerID,totalTime,totalTime);
-                data = new Timer_data(timeCountdown);
-
+                data = new Timer_data();
+                data.totalTime = function.Timer.toMilisecond(hours,minutes,seconds);
                 data.hour = mCurrentHour;
                 data.minute = mCurrentMinute;
                 data.second = mCurrentSeconds;
-                
+                //alert song
+                data.AlertSong = DefaultSong;
+
+
                 startTimer();
                 //onCountdown();
             }
@@ -260,10 +288,15 @@ public class Timer extends AppCompatActivity implements Serializable {
 
         
     }
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(broadcastReceiver);
+    }
+    //------------------------------------------LAYOUT CHANGE------------------------------------
     private void startTimerLayoutChange() {
         start_timer.setVisibility(View.GONE);
-
+        alertsong.setVisibility(View.GONE);
         timeSetting.setVisibility(View.GONE);
         //OnCountDown
         cancel_timer.setVisibility(View.VISIBLE);
@@ -273,7 +306,7 @@ public class Timer extends AppCompatActivity implements Serializable {
 
     private void stopTimerLayoutChange() {
         start_timer.setVisibility(View.VISIBLE);
-
+        alertsong.setVisibility(View.VISIBLE);
         timeSetting.setVisibility(View.VISIBLE);
         //OnCountDown
         cancel_timer.setVisibility(View.GONE);
@@ -281,7 +314,13 @@ public class Timer extends AppCompatActivity implements Serializable {
         ShowTimeLeft.setVisibility(View.GONE);
     }
 
+    private void ResetTime(){
+        setCurrentHour(0);
+        setCurrentMinute(0);
+        setCurrentSecond(0);
+    }
 
+    //------------------------------------------TIME CHANGE------------------------------------
     private void setCurrentSecond(int currentSecond) {
         this.mCurrentSeconds = currentSecond;
         updateSecondsDisplay();
@@ -320,26 +359,22 @@ public class Timer extends AppCompatActivity implements Serializable {
 
 
 
-    private int toMilisecond(int hours, int minutes, int second) {
-        return (hours*60*60 + minutes*60 +second)*1000;
-    }
 
+
+    //----------------------------------------SERVICE-------------------------------------
     private void stopTimer() {
         //DataStore.getInstance(this).timeCountdownQuery().deleteTimeLeft(data.getData().getID());
         stopTimerLayoutChange();
         stopService(new Intent(this,global_variable.TimerService));
+        ResetTime();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unregisterReceiver(broadcastReceiver);
-    }
+
 
     private void startTimer() {
         Intent startTimer =new Intent(this,global_variable.TimerService);
         //Send time data
-        Log.e("",data.getData().getTotalTime()+"");
+        //Log.e("",data.getData().getTotalTime()+"");
         startTimer.putExtra("Timer_data", (Serializable) data);
         //startActivity(startTimer);
         startService(startTimer);

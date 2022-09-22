@@ -15,6 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight=".91"
+            android:visibility="visible"
             >
 
             <ProgressBar
@@ -45,7 +46,7 @@
                 app:layout_constraintHorizontal_bias="0.498"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.856" />
+                app:layout_constraintVertical_bias="0.79" />
 
             <Button
                 android:id="@+id/Resume_timer"
@@ -99,8 +100,8 @@
 
             <LinearLayout
                 android:id="@+id/timeSetting"
-                android:layout_width="231dp"
-                android:layout_height="182dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
 
                 app:layout_constraintBottom_toTopOf="@+id/start_timer"
@@ -123,12 +124,37 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/PercentageOfTimeLeft" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/choose_alert_song"
+                android:layout_width="253dp"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text="Name"
+                android:hint="Alert song"
+                app:layout_constraintBottom_toTopOf="@+id/start_timer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/timeSetting"
+                app:layout_constraintVertical_bias="0.0"
+                android:visibility="visible"
+                >
+                <AutoCompleteTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Radar"
+                    android:id="@+id/alertsong_choosed"
+                    >
+                </AutoCompleteTextView>
+            </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight=".095"
+            android:layout_weight=".092"
             >
             <include
                 layout="@layout/function_bar"/>

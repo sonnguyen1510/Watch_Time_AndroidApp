@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 @Entity
 public class timeCountdown implements Serializable {
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey(autoGenerate = true)
     @NonNull
     private int ID;
     private int timeLeft;

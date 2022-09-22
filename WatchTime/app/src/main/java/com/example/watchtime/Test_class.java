@@ -25,7 +25,7 @@ public class Test_class extends AppCompatActivity implements Serializable {
 
         showdata = findViewById(R.id.test_data);
 
-        int totalTime = data.getData().getTotalTime();
+        int totalTime = data.totalTime;
         int hour = totalTime/(60*60*1000);
         int minutes = (totalTime - (hour*(60*60*1000)))/(60*1000);
         int second = (totalTime - hour*(60*60*1000) - minutes*60*1000)/1000;

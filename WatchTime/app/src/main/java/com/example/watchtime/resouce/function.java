@@ -76,5 +76,9 @@ public class function {
             time[2] = second;
             return time ;
         }
+
+        public static int toMilisecond(int hours, int minutes, int second) {
+            return (hours*60*60 + minutes*60 +second)*1000;
+        }
     }
 }

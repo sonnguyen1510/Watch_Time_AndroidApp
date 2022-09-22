@@ -27,7 +27,7 @@ public class global_variable {
      ------------------------DATABASE----------------------------
      */
     //Database version:
-    public static final int Database_Version = 1;
+    public static final int Database_Version = 2;
 
     /**
      *
