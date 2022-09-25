@@ -19,10 +19,7 @@ import com.example.watchtime.resouce.function;
 import com.example.watchtime.resouce.global_variable;
 import com.example.watchtime.resouce.Object.Timer_data;
 
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
-
-public class TimeCountdown extends Service {
+public class TimerProcess extends Service {
     private static final int NOTIF_ID=1;
     private Timer_data data;
     private MediaPlayer mediaPlayer;
@@ -34,7 +31,7 @@ public class TimeCountdown extends Service {
         data = (Timer_data) intent.getSerializableExtra("Timer_data");
         //Log.e("In handle intent",data.getData().getTimeLeft()+"");
         mediaPlayer = new MediaPlayer();
-
+        //stopSelf();
         startTime();
 
         //Log.e("In service",data.getData().getTotalTime()+"");
@@ -101,7 +98,7 @@ public class TimeCountdown extends Service {
     public void UpdateTimetoUI(String time){
         Intent SendTimeData = new Intent();
         SendTimeData.setAction("com.example.watchtime.source.ui.Time");
-        SendTimeData.putExtra(global_variable.BroadcaseIntentName,time );
+        SendTimeData.putExtra(global_variable.TimeData,time );
         sendBroadcast(SendTimeData);
     }
 
@@ -118,11 +115,16 @@ public class TimeCountdown extends Service {
         PendingIntent contentIntent = PendingIntent.getActivity(this,
                 0, new Intent(this, global_variable.Timer_activity), 0);
 
+        PendingIntent stopTimer = PendingIntent.getService(this,0,new Intent(this,global_variable.TimerService),0 );
+
         return new Notification.Builder(this)
                 .setContentTitle("Time countdown")
                 .setContentText(text)
                 .setSmallIcon(R.drawable.img)
-                .setContentIntent(contentIntent).getNotification();
+                .setContentIntent(contentIntent)
+                .addAction(R.drawable.ic_baseline_timer_red, "Stop",stopTimer)
+                .getNotification()
+                ;
     }
 
     private void updateNotification(String text) {

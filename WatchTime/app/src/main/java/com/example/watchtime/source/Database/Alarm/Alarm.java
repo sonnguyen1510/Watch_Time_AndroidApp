@@ -5,22 +5,22 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity
-public class alarmList {
+public class Alarm {
     @NonNull
     @PrimaryKey(autoGenerate = false)
     private int ID;
     private String tittle;
-    private String time;
+    private int Hours;
+    private int Minutes;
     private boolean isActive;
 
-    public int getID() {
-        return ID;
+    public int getHours() {
+        return Hours;
     }
 
-    public void setID(@NonNull int ID) {
-        this.ID = ID;
+    public void setHours(int hours) {
+        Hours = hours;
     }
-
     public String getTittle() {
         return tittle;
     }
@@ -29,12 +29,21 @@ public class alarmList {
         this.tittle = tittle;
     }
 
-    public String getTime() {
-        return time;
+    public int getMinutes() {
+        return Minutes;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setMinutes(int minutes) {
+        Minutes = minutes;
+    }
+
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(@NonNull int ID) {
+        this.ID = ID;
     }
 
     public boolean isActive() {

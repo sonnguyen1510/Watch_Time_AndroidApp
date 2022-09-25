@@ -14,7 +14,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WatchTime"
         tools:targetApi="31">
-        <service android:name=".source.ui.Time.TimeCountdown" />
+        <receiver
+            android:name=".source.ui.alarm.alarmReciver"
+            android:enabled="true"
+            android:exported="true">
+        </receiver>
+        <service android:name=".source.ui.Time.TimerProcess" />
         <activity
             android:name=".source.ui.world_clock.world_clock"
             android:exported="true"

@@ -1,16 +1,33 @@
 package com.example.watchtime.source.ui.alarm;
 
+import static com.example.watchtime.resouce.global_variable.AlarmData;
 import static com.example.watchtime.resouce.global_variable.World_Clock_activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.watchtime.R;
+import com.example.watchtime.source.Database.Alarm.Alarm;
+import com.example.watchtime.source.Database.DataStore;
+import com.example.watchtime.source.ui.alarm.alarm_view.list_alarm;
+
+
+import java.util.List;
 
 public class alarm extends AppCompatActivity {
     /**
@@ -22,11 +39,11 @@ public class alarm extends AppCompatActivity {
     /**
 
     /**
-     * -----------------------
+     * -------------------ALARM-----------------------
      */
-
-
-
+    public list_alarm alarmAdapter;
+    public List<Alarm> alarmData;
+    public RecyclerView AlarmView;
 
 
     @Override
@@ -34,6 +51,7 @@ public class alarm extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alarm);
 
+        AlarmView = findViewById(R.id.alarm_list);
         /**
          * --------------------------------MENU----------------------------
          */
@@ -68,6 +86,43 @@ public class alarm extends AppCompatActivity {
         /**
          ------------------------------ALARM--------------------------------------
          */
+        //----------SHOW ALARM DATA-----------
+        try {
+            alarmData = DataStore.getInstance(this).alarmListQuery().getAllAlarm();
+            alarmAdapter  = new list_alarm(alarmData,this);
+            AlarmView.setAdapter(alarmAdapter);
+            AlarmView.setLayoutManager(new LinearLayoutManager(this));
+        }catch (Exception e){
+            e.printStackTrace();
+            Toast.makeText(this,"Can't get alarm data", Toast.LENGTH_LONG);
+        }
 
+        //--------------
+
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.alarm, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.add_item:
+                AddAlarm();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void AddAlarm() {
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        //PopupWindow pw = new PopupWindow(inflater.inflate(R.layout.popup_example, null, false),100,100, true);
+        //pw.showAtLocation(, Gravity.CENTER, 0, 0);
     }
 }

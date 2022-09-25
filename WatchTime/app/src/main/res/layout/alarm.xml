@@ -6,13 +6,12 @@
     >
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".91"
         android:orientation="vertical">
-
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight=".91"
+            android:layout_height="match_parent"
             >
             <TextView
                 android:layout_width="wrap_content"
@@ -36,10 +35,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight=".09"
+            android:layout_weight=".092"
             >
-            <include
-                layout="@layout/function_bar"/>
+
+            <include layout="@layout/function_bar" />
 
         </LinearLayout>
     </LinearLayout>

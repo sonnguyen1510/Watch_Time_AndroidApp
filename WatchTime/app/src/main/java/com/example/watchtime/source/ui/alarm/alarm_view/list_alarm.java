@@ -11,15 +11,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.watchtime.R;
-import com.example.watchtime.source.Database.Alarm.alarmList;
+import com.example.watchtime.source.Database.Alarm.Alarm;
 
 import java.util.List;
 
 public class list_alarm extends RecyclerView.Adapter<list_alarm.alarm> {
-    private List<alarmList>data ;
-            private Context context;
+    private List<Alarm>data ;
+    private Context context;
 
-    public list_alarm(List<alarmList> data , Context context) {
+    public list_alarm(List<Alarm> data , Context context) {
         this.data = data;
         this.context = context;
     }
@@ -34,8 +34,8 @@ public class list_alarm extends RecyclerView.Adapter<list_alarm.alarm> {
 
     @Override
     public void onBindViewHolder(@NonNull alarm holder, int position) {
-        alarmList alarmData = data.get(position);
-        holder.time.setText(alarmData.getTime() + "");
+        Alarm alarmData = data.get(position);
+        holder.time.setText(alarmData.getHours() + ":"+alarmData.getMinutes());
         holder.tittle.setText(alarmData.getTittle() +"");
         holder.activeAlarm.setChecked(alarmData.isActive());
     }

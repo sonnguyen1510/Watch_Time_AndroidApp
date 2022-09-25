@@ -3,21 +3,15 @@ package com.example.watchtime.source.ui.Time;
 import static com.example.watchtime.resouce.global_variable.World_Clock_activity;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.IBinder;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
@@ -26,15 +20,12 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.example.watchtime.R;
 import com.example.watchtime.resouce.function;
 import com.example.watchtime.resouce.global_variable;
 import com.example.watchtime.source.Database.DataStore;
 import com.example.watchtime.source.Database.Timer.AlertSong;
-import com.example.watchtime.source.Database.Timer.AlertSongQuery;
-import com.example.watchtime.source.Database.Timer.timeCountdown;
 import com.example.watchtime.resouce.Object.Timer_data;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -77,38 +68,29 @@ public class Timer extends AppCompatActivity implements Serializable {
     private int mCurrentMinute = 0; // 0-59
     private int mCurrentSeconds = 0; // 0-59
 
+    public static final NumberPicker.Formatter TWO_DIGIT_FORMATTER =
+            new NumberPicker.Formatter() {
+
+                @Override
+                public String format(int value) {
+                    return String.format("%02d", value);
+                }
+            };
 
     /**
-     *********************************CONNECT TO SERVICE ****************************
+     *********************************CONTACT TO SERVICE ****************************
      */
     //Use to get time data from service
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String datatime = intent.getStringExtra(global_variable.BroadcaseIntentName);
-
-            //timeCountdown timeCountdown= DataStore.getInstance(Timer.this).timeCountdownQuery().getTimeLeft(global_variable.TimerID);
-            //data = new Timer_data(timeCountdown);
-            //int[] time = function.Timer.getTime(timeCountdown.getTimeLeft());
-
-            //data.second = time[2];
-            //data.minute = time[1];
-            //data.hour = time[0];
+            String datatime = intent.getStringExtra(global_variable.TimeData);
             startTimerLayoutChange();
             ShowTimeLeft.setText(datatime);
 
         }
     };
 
-    public static final NumberPicker.Formatter TWO_DIGIT_FORMATTER =
-            new NumberPicker.Formatter() {
-
-                @Override
-                public String format(int value) {
-                    // TODO Auto-generated method stub
-                    return String.format("%02d", value);
-                }
-            };
 
     /**---------------------------------------------ACTIVITY--------------------------------------*/
     @Override
@@ -376,7 +358,6 @@ public class Timer extends AppCompatActivity implements Serializable {
         //Send time data
         //Log.e("",data.getData().getTotalTime()+"");
         startTimer.putExtra("Timer_data", (Serializable) data);
-        //startActivity(startTimer);
         startService(startTimer);
     }
 }
