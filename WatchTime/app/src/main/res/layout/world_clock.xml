@@ -8,38 +8,31 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="WORLD CLOCK"
+            android:textStyle="bold"
+            android:textSize="30dp"
+            android:layout_margin="10dp"
+            />
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight=".91">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"></TextView>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            >
-            <androidx.recyclerview.widget.RecyclerView
+            android:layout_height="match_parent">
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/world_clock_list"
+                android:orientation="vertical"
                 >
-            </androidx.recyclerview.widget.RecyclerView>
-        </LinearLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/worldClock_list"
+                    >
+                </androidx.recyclerview.widget.RecyclerView>
+            </LinearLayout>
         </ScrollView>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight=".09">
-
-            <include layout="@layout/function_bar" />
-
-        </LinearLayout>
-
-
     </LinearLayout>
+
 
 </androidx.drawerlayout.widget.DrawerLayout>

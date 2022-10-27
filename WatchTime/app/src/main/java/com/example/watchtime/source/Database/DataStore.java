@@ -1,7 +1,7 @@
 package com.example.watchtime.source.Database;
 
 
-import static com.example.watchtime.resouce.global_variable.Database_Version;
+import static com.example.watchtime.source.GlobalData.global_variable.Database_Version;
 
 import android.content.Context;
 

@@ -1,12 +1,15 @@
-package com.example.watchtime.source.ui.Time;
-
-import static com.example.watchtime.resouce.global_variable.World_Clock_activity;
+package com.example.watchtime.source.ui;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,31 +18,43 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.watchtime.R;
-import com.example.watchtime.resouce.function;
-import com.example.watchtime.resouce.global_variable;
+import com.example.watchtime.source.JSON.JSONReader;
+import com.example.watchtime.source.Object.Timezone;
+import com.example.watchtime.source.GlobalData.function;
+import com.example.watchtime.source.GlobalData.global_variable;
 import com.example.watchtime.source.Database.DataStore;
 import com.example.watchtime.source.Database.Timer.AlertSong;
-import com.example.watchtime.resouce.Object.Timer_data;
+import com.example.watchtime.source.Object.Timer_data;
+import com.example.watchtime.source.Database.Timer.timeCountdown;
+import com.example.watchtime.source.Database.WorldClock.worldClockList;
+import com.example.watchtime.source.UIFunction.world_clock.addWorldClock_adapter;
+import com.example.watchtime.source.UIFunction.world_clock.world_clock_adapter;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Timer extends AppCompatActivity implements Serializable {
+public class Main extends AppCompatActivity implements Serializable {
     /**
      *****MENU*****
      */
     public ImageView Timer ;
     public ImageView World_Clock;
     public ImageView Alarm;
+    private int menuToChoose = 0;
     /**
      *********************************TIMER****************************
      */
@@ -78,10 +93,30 @@ public class Timer extends AppCompatActivity implements Serializable {
             };
 
     /**
+     *********************************WORLD CLOCK***************************
+     */
+    public world_clock_adapter world_clock_adapter;
+    public List<worldClockList> worldClock_data;
+    public RecyclerView showWorldClock;
+
+
+    //DATABASE
+    /**
+     * CONTENT
+     *
+     *
+     *
+     *
+     */
+    /**
+     ********************************ALARM****************************
+     */
+
+    /**
      *********************************CONTACT TO SERVICE ****************************
      */
     //Use to get time data from service
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    BroadcastReceiver TimerBroadcastReciver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String datatime = intent.getStringExtra(global_variable.TimeData);
@@ -91,22 +126,54 @@ public class Timer extends AppCompatActivity implements Serializable {
         }
     };
 
+    BroadcastReceiver worldClockReciver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String upDate = intent.getStringExtra(global_variable.WorldClockUpdate);
+            if(upDate.equalsIgnoreCase("isUpdateClock")){
+                UpdateClock();
+            }
+            else if (upDate.equalsIgnoreCase("isAddClock")){
+                Timezone.zones region = (Timezone.zones) intent.getSerializableExtra("Region");
+                //if(DataStore.getInstance(Main.this).worldClockListQuery().getWorldClockByRegion(region.name)==null){
+                    worldClockList newWorldClock =new worldClockList(region.value,region.name);
+
+                    worldClock_data.add(newWorldClock);
+                    DataStore.getInstance(Main.this).worldClockListQuery().InsertWorldClock(newWorldClock);
+                    world_clock_adapter.notifyDataSetChanged();
+                //}
+
+            }
+
+        }
+    };
+
+
 
     /**---------------------------------------------ACTIVITY--------------------------------------*/
     @Override
     protected void onStart() {
         super.onStart();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("com.example.watchtime.source.ui.Time");
-        registerReceiver(broadcastReceiver, intentFilter);
+        IntentFilter TimerintentFilter = new IntentFilter();
+        TimerintentFilter.addAction("com.example.watchtime.source.ui.Time");
+        registerReceiver(TimerBroadcastReciver, TimerintentFilter);
+
+        IntentFilter WorldClockintentFilter = new IntentFilter();
+        WorldClockintentFilter.addAction("com.example.watchtime.source.ui.Time.worldClock");
+        registerReceiver(worldClockReciver, WorldClockintentFilter);
+
+        //Check timer is active or not
+        if(DataStore.getInstance(this).timeCountdownQuery().getTimeLeft(global_variable.TimerID)!=null){
+            startTimerLayoutChange();
+        }
     }
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.timer);
+        setContentView(R.layout.main);
 
         //timePicker = new TimePicker(this);
-
+        showWorldClock = findViewById(R.id.worldClock_list);
         /**
          * --------------------------------MENU----------------------------
          */
@@ -125,7 +192,7 @@ public class Timer extends AppCompatActivity implements Serializable {
         World_Clock .setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(v.getContext(),World_Clock_activity));
+                //startActivity(new Intent(v.getContext(),World_Clock_activity));
             }
         });
 
@@ -134,12 +201,12 @@ public class Timer extends AppCompatActivity implements Serializable {
         Alarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(v.getContext(),World_Clock_activity));
+                //startActivity(new Intent(v.getContext(),World_Clock_activity));
             }
         });
 
         /**
-         *-------------------------------TIMER--------------------------
+         *-------------------------------TIMER-------------------------------------------
          */
         //-------------------------------SETUP--------------------------
         ShowTimeLeft = findViewById(R.id.ShowTimeLeft);
@@ -250,7 +317,7 @@ public class Timer extends AppCompatActivity implements Serializable {
                 //alert song
                 data.AlertSong = DefaultSong;
 
-
+                DataStore.getInstance(Main.this).timeCountdownQuery().storeTimeLeft(new timeCountdown(global_variable.TimerID,data.totalTime,data.totalTime));
                 startTimer();
                 //onCountdown();
             }
@@ -267,13 +334,123 @@ public class Timer extends AppCompatActivity implements Serializable {
             }
         });
 
+        /**
+         *-------------------------------WORLD CLOCK-------------------------------------------
+         */
+         //------------------LOAD WORLD CLOCK LIST-------------------------------
+        //Load world clock
+        worldClock_data = DataStore.getInstance(this).worldClockListQuery().getAllWorldClock();
+        world_clock_adapter = new world_clock_adapter(worldClock_data,this);
 
-        
+        showWorldClock.setAdapter(world_clock_adapter);
+        showWorldClock.setLayoutManager(new LinearLayoutManager(this));
+        //Updating Times
+        Intent startWorldClock =new Intent(this,global_variable.worldClockService);
+        //Send time data
+        //Log.e("",data.getData().getTotalTime()+"");
+        startService(startWorldClock);
+
+
     }
+    private void UpdateClock(){
+        world_clock_adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.addworldclock, menu);
+
+        // return true so that the menu pop up is opened
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.add_worldClockmenu:
+                openAddworldClockWindow(this);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void openAddworldClockWindow(Context main) {
+
+        /**
+         * SHOW POPUP WINDOWN
+         * */
+        //pwindow = new PopupWindow(layout,LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT,true);
+
+        // inflate the layout of the popup window
+        LayoutInflater inflater = (LayoutInflater)
+                getSystemService(LAYOUT_INFLATER_SERVICE);
+        View addWorldClock = inflater.inflate(R.layout.add_worldclock, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.MATCH_PARENT;
+        int height = LinearLayout.LayoutParams.MATCH_PARENT;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        final PopupWindow popupWindow = new PopupWindow(addWorldClock, width, height, focusable);
+
+        // show the popup window
+        // which view you pass in doesn't matter, it is only used for the window tolken
+        popupWindow.showAtLocation(this.getCurrentFocus(), Gravity.CENTER, 0, 0);
+
+        // dismiss the popup window
+        addWorldClock.findViewById(R.id.addworldclock_cancel_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
+
+        /**
+         * SHOW LIST CITY
+         * */
+        List<Timezone> listcity_ingroup = (List<Timezone>) getTimezoneData(R.raw.timezones,this);
+        List<Timezone.zones> listcity = new ArrayList<>();
+
+        for(Timezone i : listcity_ingroup){
+            Timezone.zones GroupZone = new Timezone.zones(i.getGroup(),null);
+            listcity.add(GroupZone);
+            for(Timezone.zones j : i.getZones()){
+                listcity.add(j);
+            }
+        }
+
+        addWorldClock_adapter addWorldClock_adapter = new addWorldClock_adapter(listcity,this);
+        showWorldClock = addWorldClock.findViewById(R.id.addworldclock_listcity);
+        showWorldClock.setAdapter(addWorldClock_adapter);
+        showWorldClock.setLayoutManager(new LinearLayoutManager(this));
+
+        /**
+         * SEARCH CITYS
+         * */
+
+        SearchView searchCity = addWorldClock.findViewById(R.id.addworldclock_search_city);
+        searchCity.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                String Search = newText;
+                addWorldClock_adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
+
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
-        unregisterReceiver(broadcastReceiver);
+        unregisterReceiver(TimerBroadcastReciver);
     }
     //------------------------------------------LAYOUT CHANGE------------------------------------
     private void startTimerLayoutChange() {
@@ -340,9 +517,6 @@ public class Timer extends AppCompatActivity implements Serializable {
     }
 
 
-
-
-
     //----------------------------------------SERVICE-------------------------------------
     private void stopTimer() {
         //DataStore.getInstance(this).timeCountdownQuery().deleteTimeLeft(data.getData().getID());
@@ -360,6 +534,17 @@ public class Timer extends AppCompatActivity implements Serializable {
         startTimer.putExtra("Timer_data", (Serializable) data);
         startService(startTimer);
     }
+
+    //---------------------------------WOLRD CLOCK------------------------
+    //https://www.youtube.com/watch?v=kzq9uoTC590
+    private Object getTimezoneData(int jsonfile,Context context){
+        JSONReader data = new JSONReader();
+        List<Timezone> timezonesData = (List<Timezone>) data.convertJsonToTimeZoneObject(R.raw.timezones,Main.this);
+
+        return timezonesData;
+    }
+
+
 }
 
 /*

@@ -1,9 +1,9 @@
-package com.example.watchtime.resouce;
+package com.example.watchtime.source.GlobalData;
 
 import com.example.watchtime.Test_class;
-import com.example.watchtime.source.ui.Time.TimerProcess;
-import com.example.watchtime.source.ui.Time.Timer;
-import com.example.watchtime.source.ui.world_clock.world_clock;
+import com.example.watchtime.source.UIFunction.Timer.TimerProcess;
+import com.example.watchtime.source.ui.Main;
+import com.example.watchtime.source.UIFunction.world_clock.world_clock_process;
 
 public class global_variable {
     /**
@@ -12,16 +12,16 @@ public class global_variable {
      *
      *
      */
-    public static final Class Timer_activity = Timer.class;
-    public static final Class Alarm_activity = Timer.class;
-    public static final Class World_Clock_activity = world_clock.class;
+    public static final Class Timer_activity = Main.class;
+    public static final Class Alarm_activity = Main.class;
+    //public static final Class World_Clock_activity = world_clock.class;
     public static final Class Test_class = Test_class.class;
     /**
      *
      -----------------------VARIABLE----------------------------
      */
 
-
+    public static final String APIkey = "77cef6addede40418128873416cfee07";
     /**
      *
      ------------------------DATABASE----------------------------
@@ -45,4 +45,10 @@ public class global_variable {
      */
     public static final String AlarmData = "DATAALARM";
 
+    /**
+     *
+     --------------------------WORLD CLOCK----------------------------
+     */
+    public static final String WorldClockUpdate = "DATATIME";
+    public static final Class worldClockService = world_clock_process.class;
 }

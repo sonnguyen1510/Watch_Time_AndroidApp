@@ -7,11 +7,17 @@ import androidx.room.PrimaryKey;
 @Entity
 public class worldClockList {
     @NonNull
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     private int ID;
     private String timeZone;
-    private String Region;
-    private String Time;
+    private String region;
+
+
+
+    public worldClockList(String timeZone, String region) {
+        this.timeZone = timeZone;
+        this.region = region;
+    }
 
     public int getID() {
         return ID;
@@ -30,18 +36,14 @@ public class worldClockList {
     }
 
     public String getRegion() {
-        return Region;
+        return region;
     }
 
     public void setRegion(String region) {
-        Region = region;
+        this.region = region;;
     }
 
-    public String getTime() {
-        return Time;
-    }
 
-    public void setTime(String time) {
-        Time = time;
-    }
+
+
 }

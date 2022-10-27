@@ -1,6 +1,4 @@
-package com.example.watchtime.resouce.Object;
-
-import com.example.watchtime.source.Database.Timer.timeCountdown;
+package com.example.watchtime.source.Object;
 
 import java.io.Serializable;
 

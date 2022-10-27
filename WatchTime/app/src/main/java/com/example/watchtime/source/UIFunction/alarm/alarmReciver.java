@@ -1,10 +1,10 @@
-package com.example.watchtime.source.ui.alarm;
+package com.example.watchtime.source.UIFunction.alarm;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.example.watchtime.resouce.global_variable;
+import com.example.watchtime.source.GlobalData.global_variable;
 
 public class alarmReciver extends BroadcastReceiver {
         @Override

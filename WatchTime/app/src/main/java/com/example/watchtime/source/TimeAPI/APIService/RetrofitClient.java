@@ -5,7 +5,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient{
     public static Retrofit retrofit ;
-    public static final String BASEURL = "https://timeapi.io/";
+    //public static final String BASEURL = "https://timeapi.io/";
+    public static final String BASEURL = "https://api.ipgeolocation.io/";
+
 
     public static Retrofit GetRetrofit(){
         if(retrofit== null){

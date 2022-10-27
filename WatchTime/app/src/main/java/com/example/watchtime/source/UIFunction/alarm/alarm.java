@@ -1,19 +1,16 @@
-package com.example.watchtime.source.ui.alarm;
+package com.example.watchtime.source.UIFunction.alarm;
 
-import static com.example.watchtime.resouce.global_variable.AlarmData;
-import static com.example.watchtime.resouce.global_variable.World_Clock_activity;
+
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -24,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.watchtime.R;
 import com.example.watchtime.source.Database.Alarm.Alarm;
 import com.example.watchtime.source.Database.DataStore;
-import com.example.watchtime.source.ui.alarm.alarm_view.list_alarm;
+import com.example.watchtime.source.UIFunction.alarm.alarm_view.list_alarm;
 
 
 import java.util.List;
@@ -70,7 +67,7 @@ public class alarm extends AppCompatActivity {
         World_Clock .setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(v.getContext(),World_Clock_activity));
+                //startActivity(new Intent(v.getContext(),World_Clock_activity));
             }
         });
 
@@ -79,7 +76,7 @@ public class alarm extends AppCompatActivity {
         Alarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(v.getContext(),World_Clock_activity));
+                //startActivity(new Intent(v.getContext(),World_Clock_activity));
             }
         });
 

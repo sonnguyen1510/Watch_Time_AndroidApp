@@ -1,4 +1,4 @@
-package com.example.watchtime.source.ui.Time;
+package com.example.watchtime.source.UIFunction.Timer;
 
 
 import android.app.Notification;
@@ -15,9 +15,10 @@ import android.os.IBinder;
 
 
 import com.example.watchtime.R;
-import com.example.watchtime.resouce.function;
-import com.example.watchtime.resouce.global_variable;
-import com.example.watchtime.resouce.Object.Timer_data;
+import com.example.watchtime.source.GlobalData.function;
+import com.example.watchtime.source.GlobalData.global_variable;
+import com.example.watchtime.source.Object.Timer_data;
+import com.example.watchtime.source.Database.DataStore;
 
 public class TimerProcess extends Service {
     private static final int NOTIF_ID=1;
@@ -65,7 +66,7 @@ public class TimerProcess extends Service {
         if(mediaPlayer.isPlaying()){
             mediaPlayer.release();
         }
-        //DataStore.getInstance(TimeCountdown.this).timeCountdownQuery().deleteTimeLeft(data.getData().getID());
+        DataStore.getInstance(TimerProcess.this).timeCountdownQuery().deleteTimeLeft(global_variable.TimerID);
     }
 
 
@@ -75,7 +76,7 @@ public class TimerProcess extends Service {
         onTick = new CountDownTimer(data.totalTime, 1000) {
             public void onTick(long millisUntilFinished) {
                 data.CountDown();
-                String time = function.Timer.FormatTime(data);
+                String time = function.Timer.FormatTime(data.hour,data.minute,data.second);
                 UpdateTimetoUI(time);
                 updateNotification(time);
                 //Log.e("In handle intent",time);
@@ -86,7 +87,7 @@ public class TimerProcess extends Service {
 
             public void onFinish() {
                 data.CountDown();
-                String time = function.Timer.FormatTime(data);
+                String time = function.Timer.FormatTime(data.hour,data.minute,data.second);
                 UpdateTimetoUI(time);
                 updateNotification(time);
                 alert();

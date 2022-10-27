@@ -1,4 +1,4 @@
-package com.example.watchtime.source.ui.alarm.alarm_view;
+package com.example.watchtime.source.UIFunction.alarm.alarm_view;
 
 import android.content.Context;
 import android.view.LayoutInflater;

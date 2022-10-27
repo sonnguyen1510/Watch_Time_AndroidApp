@@ -16,4 +16,7 @@ public interface worldClockListQuery {
 
     @Query("Select * from worldClockList where ID =:ID")
     List<worldClockList> getWorldClockByID(int ID);
+
+    @Query("Select * from worldClockList where Region =:Region")
+    List<worldClockList> getWorldClockByRegion(String Region);
 }
