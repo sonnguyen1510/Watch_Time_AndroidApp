@@ -8,6 +8,9 @@
         <entry key="..\:/Users/sonng/AndroidStudioProjects/WatchTime/app/src/main/res/layout/fragment_home.xml" value="0.14130434782608695" />
         <entry key="..\:/Users/sonng/AndroidStudioProjects/WatchTime/app/src/main/res/layout/fragment_notifications.xml" value="0.14130434782608695" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable-v24/alarm_button_stop.xml" value="0.1375" />
+        <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
+        <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable/addalarm.xml" value="0.1145" />
+        <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable/addworldclock.xml" value="0.1145" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable/alarm_button.xml" value="0.1375" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable/alarm_button_start.xml" value="0.1375" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable/ic_baseline_alarm.xml" value="0.1375" />
@@ -19,11 +22,16 @@
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable/ic_dashboard_black_24dp.xml" value="0.1375" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable/ic_home_black_24dp.xml" value="0.1375" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1375" />
+        <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable/repeatday_alarmclcok.xml" value="0.1145" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable/searchbutton_createworldclock.xml" value="0.1145" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable/searchview_addworldclock.xml" value="0.1145" />
+        <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable/settime_button.xml" value="0.1145" />
+        <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable/showalarmtime.xml" value="0.1145" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/drawable/time_progress.xml" value="0.1" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/activity_main.xml" value="0.16666666666666666" />
-        <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/add_alarm.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/add_alarm.xml" value="0.22" />
+        <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/add_worldclock.xml" value="0.14130434782608695" />
+        <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/addalarm.xml" value="0.14130434782608695" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/alarm.xml" value="0.22" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/alarm_item.xml" value="0.22" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/alertsong_dropdownitem.xml" value="0.3333333333333333" />
@@ -35,6 +43,8 @@
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/create_worldclock.xml" value="0.22" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/function_bar.xml" value="0.14130434782608695" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/main.xml" value="0.14130434782608695" />
+        <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/repeatday_item.xml" value="0.14130434782608695" />
+        <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/te.xml" value="0.109375" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/test.xml" value="0.14130434782608695" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/time_picker_dialog.xml" value="0.22" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/layout/time_picker_widget.xml" value="0.22" />
@@ -43,6 +53,7 @@
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/menu/addworldclock.xml" value="0.1" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/menu/alarm.xml" value="0.1796875" />
         <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/menu/bottom_nav_menu.xml" value="0.1" />
+        <entry key="..\:/Users/sonng/OneDrive/Desktop/WatchTimeApp/Watch_Time_AndroidApp/WatchTime/app/src/main/res/menu/timer.xml" value="0.134765625" />
       </map>
     </option>
   </component>

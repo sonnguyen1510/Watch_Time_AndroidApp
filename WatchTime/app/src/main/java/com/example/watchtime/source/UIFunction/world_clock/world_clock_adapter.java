@@ -1,9 +1,15 @@
 package com.example.watchtime.source.UIFunction.world_clock;
 
+import static java.security.AccessController.getContext;
+
+import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,6 +19,7 @@ import com.example.watchtime.R;
 import com.example.watchtime.source.Object.Time;
 import com.example.watchtime.source.GlobalData.function;
 import com.example.watchtime.source.Database.WorldClock.worldClockList;
+import com.example.watchtime.source.ui.Main;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -57,7 +64,8 @@ public class world_clock_adapter extends RecyclerView.Adapter<world_clock_adapte
         holder.worldTime.setText(regionTime.toStringTime());
         holder.Region.setText(data.getRegion());
         holder.TimeZone.setText(function.World_clock.DayCheck(currentTime,differ)+", "+ signCheck(differ)+differ+" Hours");
-
+        // Set world clock height
+        holder.WorldClockItem.setMinimumWidth(getScreenWidth());
     }
 
     private String signCheck(int differ) {
@@ -65,6 +73,13 @@ public class world_clock_adapter extends RecyclerView.Adapter<world_clock_adapte
             return "+";
         else
             return "";
+    }
+    public static int getScreenWidth() {
+        return Resources.getSystem().getDisplayMetrics().widthPixels;
+    }
+
+    public static int getScreenHeight() {
+        return Resources.getSystem().getDisplayMetrics().heightPixels;
     }
 
     @Override
@@ -76,11 +91,13 @@ public class world_clock_adapter extends RecyclerView.Adapter<world_clock_adapte
         TextView worldTime;
         TextView Region;
         TextView TimeZone;
+        LinearLayout WorldClockItem;
         public world_clock_view(@NonNull View itemView) {
             super(itemView);
             worldTime = itemView.findViewById(R.id.world_time);
             Region = itemView.findViewById(R.id.RegionName);
             TimeZone = itemView.findViewById(R.id.TimeZone);
+            WorldClockItem = itemView.findViewById(R.id.world_clock_item);
         }
     }
 }

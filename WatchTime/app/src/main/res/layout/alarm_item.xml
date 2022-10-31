@@ -4,9 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_marginLeft="15dp"
-    >
 
+    >
 
 
     <LinearLayout
@@ -22,20 +21,23 @@
                 android:id="@+id/alarm_time"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:layout_marginLeft="15dp"
                 android:text="06:25"
                 android:textSize="60dp"
                 tools:layout_editor_absoluteX="19dp"
                 tools:layout_editor_absoluteY="22dp" />
-
             <TextView
+                android:id="@+id/alarm_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/alarm_title"
-                android:text="Alarm"
-                android:layout_marginBottom="15dp"
-                >
+                android:layout_marginLeft="17dp"
+                android:text = "Title"
+                android:textStyle="bold"
+                android:textSize="20dp"></TextView>
 
-            </TextView>
+
+
+
 
         </LinearLayout>
 
@@ -45,9 +47,104 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
 
-
             />
     </LinearLayout>
 
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        >
+        <TextView
+            android:id="@+id/alarm_repeatSunday"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:text="S"
+            android:textAlignment="gravity"
+            android:gravity="center_horizontal|center_vertical"
+            android:background="@drawable/repeatday_alarmclcok"
+            android:layout_margin="10dp"
+            >
+
+        </TextView>
+        <TextView
+            android:id="@+id/alarm_repeatMonday"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:text="M"
+            android:textAlignment="gravity"
+            android:gravity="center_horizontal|center_vertical"
+            android:background="@drawable/repeatday_alarmclcok"
+            android:layout_margin="10dp"
+            >
+
+        </TextView>
+        <TextView
+            android:id="@+id/alarm_repeatTuesday"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:text="T"
+            android:textAlignment="gravity"
+            android:gravity="center_horizontal|center_vertical"
+            android:background="@drawable/repeatday_alarmclcok"
+            android:layout_margin="10dp"
+            >
+
+        </TextView>
+        <TextView
+            android:id="@+id/alarm_repeatWednesday"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:text="W"
+            android:textAlignment="gravity"
+            android:gravity="center_horizontal|center_vertical"
+            android:background="@drawable/repeatday_alarmclcok"
+            android:layout_margin="10dp"
+            >
+
+        </TextView>
+        <TextView
+            android:id="@+id/alarm_repeatThursday"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:text="Th"
+            android:textAlignment="gravity"
+            android:gravity="center_horizontal|center_vertical"
+            android:background="@drawable/repeatday_alarmclcok"
+            android:layout_margin="10dp"
+            >
+
+        </TextView>
+        <TextView
+            android:id="@+id/alarm_repeatFriday"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:text="F"
+            android:textAlignment="gravity"
+            android:gravity="center_horizontal|center_vertical"
+            android:background="@drawable/repeatday_alarmclcok"
+            android:layout_margin="10dp"
+            >
+
+        </TextView>
+        <TextView
+            android:id="@+id/alarm_repeatSaturday"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:text="Sa"
+            android:textAlignment="gravity"
+            android:gravity="center_horizontal|center_vertical"
+            android:background="@drawable/repeatday_alarmclcok"
+            android:layout_margin="10dp"
+            >
+
+        </TextView>
+    </LinearLayout>
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_weight="1"
+        android:background="?android:attr/listDivider" />
 </LinearLayout>

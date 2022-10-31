@@ -60,8 +60,8 @@ public class addWorldClock_adapter extends RecyclerView.Adapter<addWorldClock_ad
                 @Override
                 public void onClick(View v) {
                     Intent SendTimeData = new Intent();
-                    SendTimeData.setAction("com.example.watchtime.source.ui.Time.worldClock");
-                    SendTimeData.putExtra(global_variable.WorldClockUpdate,"isAddClock");
+                    SendTimeData.setAction("com.example.watchtime.source.ui.Time");
+                    SendTimeData.putExtra(global_variable.Request,"isAddClock");
                     SendTimeData.putExtra("Region",citydata);
                     v.getContext().sendBroadcast(SendTimeData);
                 }

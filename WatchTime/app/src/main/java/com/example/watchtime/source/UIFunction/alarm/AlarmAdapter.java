@@ -1,4 +1,4 @@
-package com.example.watchtime.source.UIFunction.alarm.alarm_view;
+package com.example.watchtime.source.UIFunction.alarm;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -12,14 +12,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.watchtime.R;
 import com.example.watchtime.source.Database.Alarm.Alarm;
+import com.example.watchtime.source.Object.AlarmList;
 
 import java.util.List;
 
-public class list_alarm extends RecyclerView.Adapter<list_alarm.alarm> {
-    private List<Alarm>data ;
+public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
+    private AlarmList data ;
     private Context context;
 
-    public list_alarm(List<Alarm> data , Context context) {
+    public AlarmAdapter(AlarmList data , Context context) {
         this.data = data;
         this.context = context;
     }
@@ -43,6 +44,10 @@ public class list_alarm extends RecyclerView.Adapter<list_alarm.alarm> {
     @Override
     public int getItemCount() {
         return data.size();
+    }
+
+    public void SetRepeat(TextView textView){
+
     }
 
     public class alarm extends RecyclerView.ViewHolder {

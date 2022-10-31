@@ -2,10 +2,18 @@ package com.example.watchtime.source.ui;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.RectF;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,22 +23,28 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
-import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.watchtime.R;
+import com.example.watchtime.source.Database.Alarm.Alarm;
 import com.example.watchtime.source.JSON.JSONReader;
+import com.example.watchtime.source.Object.AlarmList;
 import com.example.watchtime.source.Object.Timezone;
 import com.example.watchtime.source.GlobalData.function;
 import com.example.watchtime.source.GlobalData.global_variable;
@@ -39,8 +53,11 @@ import com.example.watchtime.source.Database.Timer.AlertSong;
 import com.example.watchtime.source.Object.Timer_data;
 import com.example.watchtime.source.Database.Timer.timeCountdown;
 import com.example.watchtime.source.Database.WorldClock.worldClockList;
+import com.example.watchtime.source.UIFunction.alarm.AlarmAdapter;
 import com.example.watchtime.source.UIFunction.world_clock.addWorldClock_adapter;
 import com.example.watchtime.source.UIFunction.world_clock.world_clock_adapter;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.Serializable;
@@ -49,26 +66,26 @@ import java.util.List;
 
 public class Main extends AppCompatActivity implements Serializable {
     /**
-     *****MENU*****
+     * ****MENU*****
      */
-    public ImageView Timer ;
-    public ImageView World_Clock;
-    public ImageView Alarm;
+    public LinearLayout Timer;
+    public LinearLayout World_Clock;
+    public LinearLayout Alarm;
     private int menuToChoose = 0;
+    private ViewFlipper LayoutChange;
     /**
-     *********************************TIMER****************************
+     * ********************************TIMER****************************
      */
     public Button start_timer;
     public Button cancel_timer;
 
 
-    public Timer_data data ;
+    public Timer_data data;
     public ProgressBar PercentTimeLeft;
     public TextView ShowTimeLeft;
 
     //Alert song
     public TextInputLayout alertsong;
-    public AutoCompleteTextView alertsongChoosed;
     public List<String> ListSong;
     public ArrayAdapter<String> alertsongAdapter;
     public int DefaultSong;
@@ -93,13 +110,24 @@ public class Main extends AppCompatActivity implements Serializable {
             };
 
     /**
-     *********************************WORLD CLOCK***************************
+     * ********************************WORLD CLOCK***************************
      */
     public world_clock_adapter world_clock_adapter;
     public List<worldClockList> worldClock_data;
     public RecyclerView showWorldClock;
+    //Add world clock
+    public BottomSheetDialog addWorldClock;
 
 
+    /**
+     ********************************ALARM****************************
+     */
+
+    public AlarmList listAlarm;
+    public RecyclerView showAlarm;
+    public AlarmAdapter alarm_adapter;
+    //AddAlarm
+    public BottomSheetDialog addAlarm;
     //DATABASE
     /**
      * CONTENT
@@ -109,39 +137,39 @@ public class Main extends AppCompatActivity implements Serializable {
      *
      */
     /**
-     ********************************ALARM****************************
-     */
-
-    /**
-     *********************************CONTACT TO SERVICE ****************************
+     * ********************************CONTACT TO SERVICE ****************************
      */
     //Use to get time data from service
     BroadcastReceiver TimerBroadcastReciver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String datatime = intent.getStringExtra(global_variable.TimeData);
-            startTimerLayoutChange();
-            ShowTimeLeft.setText(datatime);
+            String Request = intent.getStringExtra(global_variable.Request);
 
-        }
-    };
-
-    BroadcastReceiver worldClockReciver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String upDate = intent.getStringExtra(global_variable.WorldClockUpdate);
-            if(upDate.equalsIgnoreCase("isUpdateClock")){
+            if (Request.equalsIgnoreCase("isUpdateClock")) {
                 UpdateClock();
-            }
-            else if (upDate.equalsIgnoreCase("isAddClock")){
+            } else if (Request.equalsIgnoreCase("isAddClock")) {
                 Timezone.zones region = (Timezone.zones) intent.getSerializableExtra("Region");
-                //if(DataStore.getInstance(Main.this).worldClockListQuery().getWorldClockByRegion(region.name)==null){
-                    worldClockList newWorldClock =new worldClockList(region.value,region.name);
+                if (DataStore.getInstance(Main.this).worldClockListQuery().getWorldClockByRegion(region.name) == null) {
+
+                    worldClockList newWorldClock = new worldClockList(region.value, region.name);
 
                     worldClock_data.add(newWorldClock);
                     DataStore.getInstance(Main.this).worldClockListQuery().InsertWorldClock(newWorldClock);
                     world_clock_adapter.notifyDataSetChanged();
-                //}
+
+                    if(addWorldClock.isShowing()){
+                        addWorldClock.dismiss();
+                    }
+                } else {
+                    Toast.makeText(Main.this, "This world clock has been added !", Toast.LENGTH_LONG);
+                }
+            }
+            else if(Request.equalsIgnoreCase("UpdateTimer")){
+                String datatime = intent.getStringExtra(global_variable.TimeData);
+                startTimerLayoutChange();
+                ShowTimeLeft.setText(datatime);
+            }
+            else if(Request.equalsIgnoreCase("AddAlarm")){
 
             }
 
@@ -149,8 +177,9 @@ public class Main extends AppCompatActivity implements Serializable {
     };
 
 
-
-    /**---------------------------------------------ACTIVITY--------------------------------------*/
+    /**
+     * ---------------------------------------------ACTIVITY--------------------------------------
+     */
     @Override
     protected void onStart() {
         super.onStart();
@@ -158,50 +187,90 @@ public class Main extends AppCompatActivity implements Serializable {
         TimerintentFilter.addAction("com.example.watchtime.source.ui.Time");
         registerReceiver(TimerBroadcastReciver, TimerintentFilter);
 
-        IntentFilter WorldClockintentFilter = new IntentFilter();
-        WorldClockintentFilter.addAction("com.example.watchtime.source.ui.Time.worldClock");
-        registerReceiver(worldClockReciver, WorldClockintentFilter);
 
         //Check timer is active or not
-        if(DataStore.getInstance(this).timeCountdownQuery().getTimeLeft(global_variable.TimerID)!=null){
+        if (DataStore.getInstance(this).timeCountdownQuery().getTimeLeft(global_variable.TimerID) != null) {
             startTimerLayoutChange();
         }
+
+        //Start layout is world clock
+        ImageView WorldClockImage = findViewById(R.id.world_clock_image);
+        WorldClockImage.setImageResource(R.drawable.ic_baseline_world_clock_red);
+        WorldClockMenu();
+        //startActivity(new Intent(v.getContext(),World_Clock_activity));
+        LayoutChange.setDisplayedChild(LayoutChange.indexOfChild(findViewById(R.id.world_clock)));
+
+
     }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        /**
+         * RUN APP FIRST TIME
+         */
+        //------------------------------ALERT--------------------------
+        //-----FIRST USING APP ------------
+        if (DataStore.getInstance(this).alertSongQuery().getAllAlertsong().isEmpty()) {
+            List<AlertSong> CreateFristListSong = new ArrayList<>();
+            CreateFristListSong.add(new AlertSong("  Radar", R.raw.radar));
+            CreateFristListSong.add(new AlertSong("  Apex", R.raw.apex));
 
-        //timePicker = new TimePicker(this);
-        showWorldClock = findViewById(R.id.worldClock_list);
+            for (AlertSong data : CreateFristListSong) {
+                DataStore.getInstance(this).alertSongQuery().insertAlertSong(data);
+            }
+        }
+        //-----SET DEFAULT ------------
+        DefaultSong = R.raw.radar;
+
+
+
         /**
          * --------------------------------MENU----------------------------
          */
-        //Timer activity setup
+        LayoutChange=  findViewById(R.id.UIFunction);
         Timer = findViewById(R.id.Timer_button);
-        Timer.setImageResource(R.drawable.ic_baseline_timer_red);
+        World_Clock = findViewById(R.id.world_clock_button);
+        Alarm = findViewById(R.id.alarm_button);
+
+        //Timer activity setup
+
         Timer.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-
+            public void onClick(View v) {
+                // or you can switch selecting the layout that you want to display
+                ClearOptionChoice();
+                TimerMenu();
+                ImageView TimerImage = findViewById(R.id.Timer_image);
+                TimerImage.setImageResource(R.drawable.ic_baseline_timer_red);
+                LayoutChange.setDisplayedChild(LayoutChange.indexOfChild(findViewById(R.id.Timer)));
             }
         });
 
         //world clock activity setup
-        World_Clock = findViewById(R.id.world_clock_button);
-        World_Clock .setOnClickListener(new View.OnClickListener() {
+        World_Clock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ClearOptionChoice();
+                WorldClockMenu();
+                ImageView WorldClockImage = findViewById(R.id.world_clock_image);
+                WorldClockImage.setImageResource(R.drawable.ic_baseline_world_clock_red);
                 //startActivity(new Intent(v.getContext(),World_Clock_activity));
+                LayoutChange.setDisplayedChild(LayoutChange.indexOfChild(findViewById(R.id.world_clock)));
             }
         });
 
-        //world clock activity setup
-        Alarm = findViewById(R.id.alarm_button);
+        //Alarm activity setup
         Alarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ClearOptionChoice();
+                AlarmMenu();
+                ImageView AlarmImage = findViewById(R.id.alarm_image);
+                AlarmImage.setImageResource(R.drawable.ic_baseline_alarm_red);
                 //startActivity(new Intent(v.getContext(),World_Clock_activity));
+                LayoutChange.setDisplayedChild(LayoutChange.indexOfChild(findViewById(R.id.alarm)));
             }
         });
 
@@ -218,9 +287,9 @@ public class Main extends AppCompatActivity implements Serializable {
 
         //------------------------------TIME PICKER--------------------
 
-        mHourPicker= findViewById(R.id.hour);
-        mMinutePicker= findViewById(R.id.minute);
-        mSecondPicker= findViewById(R.id.seconds);
+        mHourPicker = findViewById(R.id.hour);
+        mMinutePicker = findViewById(R.id.minute);
+        mSecondPicker = findViewById(R.id.seconds);
 
         setCurrentHour(0);
         setCurrentMinute(0);
@@ -254,7 +323,7 @@ public class Main extends AppCompatActivity implements Serializable {
         mSecondPicker = (NumberPicker) findViewById(R.id.seconds);
         mSecondPicker.setMinValue(0);
         mSecondPicker.setMaxValue(59);
-        mSecondPicker.setFormatter( TWO_DIGIT_FORMATTER);
+        mSecondPicker.setFormatter(TWO_DIGIT_FORMATTER);
         mSecondPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
 
             @Override
@@ -262,26 +331,14 @@ public class Main extends AppCompatActivity implements Serializable {
                 mCurrentSeconds = newVal;
             }
         });
-        //------------------------------ALERT--------------------------
-        //-----FIRST USING APP ------------
-        if(DataStore.getInstance(this).alertSongQuery().getAllAlertsong().isEmpty()){
-            List<AlertSong> CreateFristListSong = new ArrayList<>();
-            CreateFristListSong.add(new AlertSong("Radar",R.raw.radar));
-            CreateFristListSong.add(new AlertSong("Apex",R.raw.apex));
 
-            for (AlertSong data:CreateFristListSong) {
-                DataStore.getInstance(this).alertSongQuery().insertAlertSong(data);
-            }
-        }
-        //-----SET DEFAULT ------------
-        DefaultSong = R.raw.radar;
 
         //-----SETUP DROPDOWN ALERT SONG MENU--------------
         alertsong = findViewById(R.id.choose_alert_song);
-        alertsongChoosed = findViewById(R.id.alertsong_choosed);
+        AutoCompleteTextView alertsongChoosed = findViewById(R.id.alertsong_choosed);
         ListSong = DataStore.getInstance(this).alertSongQuery().getAllAlertsong();
 
-        alertsongAdapter = new ArrayAdapter<>(this,R.layout.alertsong_dropdownitem,ListSong);
+        alertsongAdapter = new ArrayAdapter<>(this, R.layout.alertsong_dropdownitem, ListSong);
         alertsongChoosed.setAdapter(alertsongAdapter);
         alertsongChoosed.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -289,7 +346,7 @@ public class Main extends AppCompatActivity implements Serializable {
                 String item = parent.getItemAtPosition(position).toString();
                 try {
                     DefaultSong = DataStore.getInstance(view.getContext()).alertSongQuery().getAlertSong(item);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -310,14 +367,14 @@ public class Main extends AppCompatActivity implements Serializable {
                 int seconds = mCurrentSeconds;
 
                 data = new Timer_data();
-                data.totalTime = function.Timer.toMilisecond(hours,minutes,seconds);
+                data.totalTime = function.Timer.toMilisecond(hours, minutes, seconds);
                 data.hour = mCurrentHour;
                 data.minute = mCurrentMinute;
                 data.second = mCurrentSeconds;
                 //alert song
                 data.AlertSong = DefaultSong;
 
-                DataStore.getInstance(Main.this).timeCountdownQuery().storeTimeLeft(new timeCountdown(global_variable.TimerID,data.totalTime,data.totalTime));
+                DataStore.getInstance(Main.this).timeCountdownQuery().storeTimeLeft(new timeCountdown(global_variable.TimerID, data.totalTime, data.totalTime));
                 startTimer();
                 //onCountdown();
             }
@@ -337,31 +394,230 @@ public class Main extends AppCompatActivity implements Serializable {
         /**
          *-------------------------------WORLD CLOCK-------------------------------------------
          */
-         //------------------LOAD WORLD CLOCK LIST-------------------------------
+        //------------------LOAD WORLD CLOCK LIST-------------------------------
         //Load world clock
+        showWorldClock = findViewById(R.id.worldClock_list);
         worldClock_data = DataStore.getInstance(this).worldClockListQuery().getAllWorldClock();
-        world_clock_adapter = new world_clock_adapter(worldClock_data,this);
+        world_clock_adapter = new world_clock_adapter(worldClock_data, this);
 
         showWorldClock.setAdapter(world_clock_adapter);
         showWorldClock.setLayoutManager(new LinearLayoutManager(this));
         //Updating Times
-        Intent startWorldClock =new Intent(this,global_variable.worldClockService);
+        Intent startWorldClock = new Intent(this, global_variable.worldClockService);
         //Send time data
         //Log.e("",data.getData().getTotalTime()+"");
         startService(startWorldClock);
 
+        //swipe layout : https://github.com/chthai64/SwipeRevealLayout
+        worldClockList deleteWorldClock = null;
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                switch (direction) {
+                    case ItemTouchHelper.LEFT:
+                        new AlertDialog.Builder(Main.this).setTitle("Delete world clock")
+                                .setMessage("Delete world clock " + worldClock_data.get(position).getRegion())
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        world_clock_adapter.notifyItemChanged(position);
+                                        dialog.cancel();
+                                    }
+                                })
+                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        DataStore.getInstance(Main.this).worldClockListQuery().deleteWorldClock(worldClock_data.get(position).getID());
+                                        world_clock_adapter.notifyItemRemoved(position);
+                                    }
+                                })
+                                .create().show();
+                }
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+
+                    View itemView = viewHolder.itemView;
+                    int height = itemView.getBottom() - itemView.getTop();
+                    int width = height / 3;
+                    if (dX < 0) {
+                        Paint p = new Paint();
+                        p.setColor(Color.RED);
+                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
+                        c.drawRect(background, p);
+                        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.delete);
+                        float margin = (dX / 5 - width) / 2;
+                        RectF iconDest = new RectF((float) itemView.getRight() + margin, (float) itemView.getTop() + width, (float) itemView.getRight() + (margin + width), (float) itemView.getBottom() - width);
+                        c.drawBitmap(icon, null, iconDest, p);
+
+                    }
+
+
+                } else {
+                    c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+
+            @Override
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder holder) {
+                int position = holder.getAdapterPosition();
+                int dragFlags = 0; // whatever your dragFlags need to be
+                int swipeFlags = createSwipeFlags(position);
+
+                return makeMovementFlags(dragFlags, swipeFlags);
+            }
+
+            private int createSwipeFlags(int position) {
+                return position == 0 ? 0 : ItemTouchHelper.LEFT;
+            }
+        };
+
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(showWorldClock);
+
+        /**
+         *-------------------------------ALARM-------------------------------------------
+         */
+            try {
+            List<com.example.watchtime.source.Database.Alarm.Alarm> lsAlarm = DataStore.getInstance(this).alarmListQuery().getAllAlarm();
+            listAlarm = new AlarmList(lsAlarm);
+            alarm_adapter  = new AlarmAdapter(listAlarm,this);
+            showAlarm.setAdapter(alarm_adapter);
+            showAlarm.setLayoutManager(new LinearLayoutManager(this));
+            }catch (Exception e){
+                e.printStackTrace();
+                Toast.makeText(this,"Can't get alarm data", Toast.LENGTH_LONG);
+            }
+
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallbackForAlarmItem = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                switch (direction) {
+                    case ItemTouchHelper.LEFT:
+                        new AlertDialog.Builder(Main.this).setTitle("Delete alarm")
+                                .setMessage("Delete this alarm ?")
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        alarm_adapter.notifyItemChanged(position);
+                                        dialog.cancel();
+                                    }
+                                })
+                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        DataStore.getInstance(Main.this).worldClockListQuery().deleteWorldClock(worldClock_data.get(position).getID());
+                                        alarm_adapter.notifyItemRemoved(position);
+                                    }
+                                })
+                                .create().show();
+                }
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+
+                    View itemView = viewHolder.itemView;
+                    int height = itemView.getBottom() - itemView.getTop();
+                    int width = height / 3;
+                    if (dX < 0) {
+                        Paint p = new Paint();
+                        p.setColor(Color.RED);
+                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
+                        c.drawRect(background, p);
+                        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.delete);
+                        float margin = (dX / 5 - width) / 2;
+                        RectF iconDest = new RectF((float) itemView.getRight() + margin, (float) itemView.getTop() + width, (float) itemView.getRight() + (margin + width), (float) itemView.getBottom() - width);
+                        c.drawBitmap(icon, null, iconDest, p);
+
+                    }
+
+
+                } else {
+                    c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+
+            @Override
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder holder) {
+                int position = holder.getAdapterPosition();
+                int dragFlags = 0; // whatever your dragFlags need to be
+                int swipeFlags = createSwipeFlags(position);
+
+                return makeMovementFlags(dragFlags, swipeFlags);
+            }
+
+            private int createSwipeFlags(int position) {
+                return position == 0 ? 0 : ItemTouchHelper.LEFT;
+            }
+        };
+
+
+        ItemTouchHelper itemTouchHelperForAlarmItem = new ItemTouchHelper(simpleItemTouchCallbackForAlarmItem );
+        itemTouchHelperForAlarmItem.attachToRecyclerView(showAlarm);
+
 
     }
-    private void UpdateClock(){
+
+
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(TimerBroadcastReciver);
+    }
+    /**
+     *-------------------------------MENU FUNCTION-------------------------------------------
+     */
+    private void TimerMenu() {
+        menuToChoose = R.menu.timer;
+        invalidateOptionsMenu();
+    }
+    private void AlarmMenu() {
+        menuToChoose = R.menu.alarm;
+        invalidateOptionsMenu();
+    }
+    private void WorldClockMenu() {
+        menuToChoose = R.menu.addworldclock;
+        invalidateOptionsMenu();
+    }
+    private void ClearOptionChoice() {
+        ImageView TimerImage = findViewById(R.id.Timer_image);
+        ImageView WorldClockImage = findViewById(R.id.world_clock_image);
+        ImageView AlarmImage = findViewById(R.id.alarm_image);
+
+        TimerImage.setImageResource(R.drawable.ic_baseline_timer);
+        AlarmImage.setImageResource(R.drawable.ic_baseline_alarm);
+        WorldClockImage.setImageResource(R.drawable.ic_baseline_world);
+    }
+
+    private void UpdateClock() {
         world_clock_adapter.notifyDataSetChanged();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.addworldclock, menu);
-
-        // return true so that the menu pop up is opened
+        inflater.inflate(menuToChoose, menu);
         return true;
     }
 
@@ -371,87 +627,84 @@ public class Main extends AppCompatActivity implements Serializable {
             case R.id.add_worldClockmenu:
                 openAddworldClockWindow(this);
                 return true;
+            case R.id.add_Alarm:
+                openAddAlarmWindow(this);
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void openAddworldClockWindow(Context main) {
-
+    private void openAddAlarmWindow(Main main) {
         /**
          * SHOW POPUP WINDOWN
          * */
-        //pwindow = new PopupWindow(layout,LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT,true);
+        BottomSheetDialog addAlarm = new BottomSheetDialog(Main.this, R.style.BottomSheetStyle);
+        BottomSheetBehavior<View> bottomSheetBehavior;
+        View sheetview = LayoutInflater.from(getApplicationContext()).inflate(R.layout.add_alarm, (LinearLayout) findViewById(R.id.add_Alarm_layout));
 
-        // inflate the layout of the popup window
-        LayoutInflater inflater = (LayoutInflater)
-                getSystemService(LAYOUT_INFLATER_SERVICE);
-        View addWorldClock = inflater.inflate(R.layout.add_worldclock, null);
 
-        // create the popup window
-        int width = LinearLayout.LayoutParams.MATCH_PARENT;
-        int height = LinearLayout.LayoutParams.MATCH_PARENT;
-        boolean focusable = true; // lets taps outside the popup also dismiss it
-        final PopupWindow popupWindow = new PopupWindow(addWorldClock, width, height, focusable);
-
-        // show the popup window
-        // which view you pass in doesn't matter, it is only used for the window tolken
-        popupWindow.showAtLocation(this.getCurrentFocus(), Gravity.CENTER, 0, 0);
-
-        // dismiss the popup window
-        addWorldClock.findViewById(R.id.addworldclock_cancel_button).setOnClickListener(new View.OnClickListener() {
+        //Set up view
+        sheetview.findViewById(R.id.add_Alarm_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                popupWindow.dismiss();
+                addAlarm.dismiss();
             }
         });
 
-        /**
-         * SHOW LIST CITY
-         * */
-        List<Timezone> listcity_ingroup = (List<Timezone>) getTimezoneData(R.raw.timezones,this);
-        List<Timezone.zones> listcity = new ArrayList<>();
+        //-----SETUP REPEATE DAY-----------------
+        List<String> listDay = new ArrayList<>();
+        listDay.add("Monday");
+        listDay.add("Tuesday");
+        listDay.add("Wednesday");
+        listDay.add("Thursday");
+        listDay.add("Friday");
+        listDay.add("Saturday");
+        listDay.add("Sunday");
+        AutoCompleteTextView repeatdaychoosed = findViewById(R.id.alarm_Repeat_time);
+        String choosedDay = new String();
+        //RecyclerView.Adapter<> RepeatDay = new
+        openChooseRepeatDay();
+        //-----SETUP DROPDOWN ALERT SONG MENU--------------
+        AutoCompleteTextView alertsongChoosed = findViewById(R.id.alarm_sound_choosed);
+        ListSong = DataStore.getInstance(this).alertSongQuery().getAllAlertsong();
+        int[] ChoosedSong = {0};
 
-        for(Timezone i : listcity_ingroup){
-            Timezone.zones GroupZone = new Timezone.zones(i.getGroup(),null);
-            listcity.add(GroupZone);
-            for(Timezone.zones j : i.getZones()){
-                listcity.add(j);
-            }
-        }
-
-        addWorldClock_adapter addWorldClock_adapter = new addWorldClock_adapter(listcity,this);
-        showWorldClock = addWorldClock.findViewById(R.id.addworldclock_listcity);
-        showWorldClock.setAdapter(addWorldClock_adapter);
-        showWorldClock.setLayoutManager(new LinearLayoutManager(this));
-
-        /**
-         * SEARCH CITYS
-         * */
-
-        SearchView searchCity = addWorldClock.findViewById(R.id.addworldclock_search_city);
-        searchCity.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        alertsongAdapter = new ArrayAdapter<>(this, R.layout.alertsong_dropdownitem, ListSong);
+        alertsongChoosed.setAdapter(alertsongAdapter);
+        alertsongChoosed.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                String Search = newText;
-                addWorldClock_adapter.getFilter().filter(newText);
-                return false;
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String item = parent.getItemAtPosition(position).toString();
+                try {
+                    ChoosedSong[0] = DataStore.getInstance(view.getContext()).alertSongQuery().getAlertSong(item);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
 
+        //Set min heigh
+        LinearLayout layout =  sheetview.findViewById(R.id.add_Alarm_layout);
+        assert layout != null;
+        layout.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
+
+        //Show view
+        addAlarm.show();
+
+
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unregisterReceiver(TimerBroadcastReciver);
+    /**
+     *-------------------------------ALARM FUNCTION-------------------------------------------
+     */
+
+
+
+    private void openChooseRepeatDay() {
     }
+
+
     //------------------------------------------LAYOUT CHANGE------------------------------------
     private void startTimerLayoutChange() {
         start_timer.setVisibility(View.GONE);
@@ -473,7 +726,7 @@ public class Main extends AppCompatActivity implements Serializable {
         ShowTimeLeft.setVisibility(View.GONE);
     }
 
-    private void ResetTime(){
+    private void ResetTime() {
         setCurrentHour(0);
         setCurrentMinute(0);
         setCurrentSecond(0);
@@ -508,6 +761,7 @@ public class Main extends AppCompatActivity implements Serializable {
         mSecondPicker.setValue(mCurrentSeconds);
         //mOnTimeChangedListener.onTimeChanged(this, getCurrentHour(), getCurrentMinute(), getCurrentSeconds());
     }
+
     /**
      * Set the state of the spinners appropriate to the current hour.
      */
@@ -521,14 +775,13 @@ public class Main extends AppCompatActivity implements Serializable {
     private void stopTimer() {
         //DataStore.getInstance(this).timeCountdownQuery().deleteTimeLeft(data.getData().getID());
         stopTimerLayoutChange();
-        stopService(new Intent(this,global_variable.TimerService));
+        stopService(new Intent(this, global_variable.TimerService));
         ResetTime();
     }
 
 
-
     private void startTimer() {
-        Intent startTimer =new Intent(this,global_variable.TimerService);
+        Intent startTimer = new Intent(this, global_variable.TimerService);
         //Send time data
         //Log.e("",data.getData().getTotalTime()+"");
         startTimer.putExtra("Timer_data", (Serializable) data);
@@ -537,38 +790,82 @@ public class Main extends AppCompatActivity implements Serializable {
 
     //---------------------------------WOLRD CLOCK------------------------
     //https://www.youtube.com/watch?v=kzq9uoTC590
-    private Object getTimezoneData(int jsonfile,Context context){
+    private Object getTimezoneData(int jsonfile, Context context) {
         JSONReader data = new JSONReader();
-        List<Timezone> timezonesData = (List<Timezone>) data.convertJsonToTimeZoneObject(R.raw.timezones,Main.this);
+        List<Timezone> timezonesData = (List<Timezone>) data.convertJsonToTimeZoneObject(R.raw.timezones, Main.this);
 
         return timezonesData;
     }
+    private void openAddworldClockWindow(Context main) {
+        //https://www.youtube.com/watch?v=hclp2377fDQ
+        /**
+         * SHOW POPUP WINDOWN
+         * */
+        addWorldClock = new BottomSheetDialog(Main.this, R.style.BottomSheetStyle);
+        BottomSheetBehavior<View> bottomSheetBehavior;
+        View sheetview = LayoutInflater.from(getApplicationContext()).inflate(R.layout.add_worldclock, (LinearLayout) findViewById(R.id.addWorldClockLayout));
 
 
-}
-
-/*
-        inputTime = findViewById(R.id.inputTime);
-        inputTime.setOnClickListener(new View.OnClickListener() {
+        //Set up view
+        sheetview.findViewById(R.id.addworldclock_cancel_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int hour = 0;
-                int minute = 0;
-
-
-                MyTimePickerDialog mTimePicker = new MyTimePickerDialog(v.getContext(), new MyTimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(com.example.watchtime.resouce.timepickerdialog.TimePicker view, int hourOfDay, int minute, int second) {
-                        inputTime.setText(String.format("%02d", hourOfDay)+
-                                ":" + String.format("%02d", minute) +
-                                ":" + String.format("%02d", second));
-                    }
-
-
-                }, 0, 0, 0, true);
-                mTimePicker.show();
-                mTimePicker.setTitle("Select Time");
-                mTimePicker.show();
+                addWorldClock.dismiss();
             }
         });
-        * */
+
+
+        /**
+         * SHOW LIST CITY
+         */
+
+        List<Timezone> listcity_ingroup = (List<Timezone>) getTimezoneData(R.raw.timezones, this);
+        List<Timezone.zones> listcity = new ArrayList<>();
+
+        for (Timezone i : listcity_ingroup) {
+            Timezone.zones GroupZone = new Timezone.zones(i.getGroup(), null);
+            listcity.add(GroupZone);
+            for (Timezone.zones j : i.getZones()) {
+                listcity.add(j);
+            }
+        }
+
+        addWorldClock_adapter addWorldClock_adapter = new addWorldClock_adapter(listcity, this);
+        RecyclerView showCityList = sheetview.findViewById(R.id.addworldclock_listcity);
+        showCityList.setAdapter(addWorldClock_adapter);
+        showCityList.setLayoutManager(new LinearLayoutManager(this));
+
+        /**
+         * SEARCH CITYS
+         * */
+
+        SearchView searchCity = sheetview.findViewById(R.id.addworldclock_search_city);
+        searchCity.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                String Search = newText;
+                addWorldClock_adapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
+        addWorldClock.setContentView(sheetview);
+        bottomSheetBehavior = BottomSheetBehavior.from((View) sheetview.getParent());
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+        //Set min heigh
+        LinearLayout layout =  sheetview.findViewById(R.id.addWorldClockLayout);
+        assert layout != null;
+        layout.setMinimumHeight(Resources.getSystem().getDisplayMetrics().heightPixels);
+
+        //Show view
+        addWorldClock.show();
+
+    }
+}
+

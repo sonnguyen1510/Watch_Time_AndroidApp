@@ -18,5 +18,8 @@ public interface worldClockListQuery {
     List<worldClockList> getWorldClockByID(int ID);
 
     @Query("Select * from worldClockList where Region =:Region")
-    List<worldClockList> getWorldClockByRegion(String Region);
+    worldClockList getWorldClockByRegion(String Region);
+
+    @Query("DELETE FROM worldClockList WHERE id =:id")
+    void deleteWorldClock(int id);
 }

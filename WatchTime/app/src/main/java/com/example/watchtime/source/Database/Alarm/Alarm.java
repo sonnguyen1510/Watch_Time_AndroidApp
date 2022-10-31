@@ -4,21 +4,52 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity
-public class Alarm {
+public class Alarm implements Serializable {
     @NonNull
     @PrimaryKey(autoGenerate = false)
     private int ID;
     private String tittle;
     private int Hours;
     private int Minutes;
+    private int alertsong;
     private boolean isActive;
+    private String Dayactive;
+
+    public Alarm(int ID, String tittle, int hours, int minutes, int alertsong, boolean isActive, String dayactive) {
+        this.ID = ID;
+        this.tittle = tittle;
+        Hours = hours;
+        Minutes = minutes;
+        this.alertsong = alertsong;
+        this.isActive = isActive;
+        Dayactive = dayactive;
+    }
+
+    public String getDayactive() {
+        return Dayactive;
+    }
+
+    public void setDayactive(String dayactive) {
+        Dayactive = dayactive;
+    }
+
+    public int getAlertsong() {
+        return alertsong;
+    }
+
+
+    public void setAlertsong(int alertsong) {
+        this.alertsong = alertsong;
+    }
 
     public int getHours() {
         return Hours;
     }
 
-    public void setHours(int hours) {
+    public void setHours(@NonNull int hours) {
         Hours = hours;
     }
     public String getTittle() {
@@ -33,7 +64,7 @@ public class Alarm {
         return Minutes;
     }
 
-    public void setMinutes(int minutes) {
+    public void setMinutes(@NonNull int minutes) {
         Minutes = minutes;
     }
 

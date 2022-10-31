@@ -99,6 +99,7 @@ public class TimerProcess extends Service {
     public void UpdateTimetoUI(String time){
         Intent SendTimeData = new Intent();
         SendTimeData.setAction("com.example.watchtime.source.ui.Time");
+        SendTimeData.putExtra(global_variable.Request,"UpdateTimer");
         SendTimeData.putExtra(global_variable.TimeData,time );
         sendBroadcast(SendTimeData);
     }

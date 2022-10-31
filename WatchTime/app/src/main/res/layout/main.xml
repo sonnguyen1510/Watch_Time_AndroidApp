@@ -11,7 +11,9 @@
         <ViewFlipper
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight=".91">
+            android:layout_weight=".91"
+            android:id="@+id/UIFunction"
+            >
             <include layout="@layout/world_clock"></include>
             <include layout="@layout/alarm"></include>
             <include layout="@layout/timer"></include>

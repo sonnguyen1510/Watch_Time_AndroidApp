@@ -51,4 +51,7 @@ public class global_variable {
      */
     public static final String WorldClockUpdate = "DATATIME";
     public static final Class worldClockService = world_clock_process.class;
+
+
+    public static String Request = "RequestToBroadcast";
 }
