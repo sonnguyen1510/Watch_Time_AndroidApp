@@ -8,17 +8,22 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
-        android:label=""
+
+        android:label="Time"
+        android:focusableInTouchMode="true"
 
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WatchTime"
         tools:targetApi="31">
         <service android:name=".source.UIFunction.Timer.TimerProcess" />
+        <service android:name=".source.UIFunction.world_clock.world_clock_process" />
+        <service android:name=".source.UIFunction.alarm.AlarmProcess" />
 
         <activity
-            android:name=".source.ui.Main"
+            android:name=".source.UI.Main"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

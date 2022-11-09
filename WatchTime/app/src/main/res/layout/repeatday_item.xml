@@ -5,21 +5,25 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_marginLeft="15dp"
+    android:background="#EDEDED"
+    android:layout_marginTop="3dp"
+
     >
     <LinearLayout
         android:id="@+id/repeat_day_isChecked"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+
+        android:layout_marginLeft="15dp"
         >
         <TextView
             android:id="@+id/repeat_day"
             android:layout_width="0dp"
-            android:layout_height="35dp"
+            android:layout_height="40dp"
             android:textAlignment="gravity"
             android:gravity="center_vertical"
-            android:layout_weight="0.6"
+            android:layout_weight="0.9"
             android:text="TextView"
             android:textSize="20dp"
             />
@@ -28,8 +32,8 @@
             android:id="@+id/repeat_day_isCheckedicon"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.2"
-            android:gravity="center_vertical"
+            android:layout_weight="0.1"
+            android:layout_gravity="center_vertical|center_horizontal"
             app:srcCompat="@drawable/ic_baseline_check_24" />
 
     </LinearLayout>

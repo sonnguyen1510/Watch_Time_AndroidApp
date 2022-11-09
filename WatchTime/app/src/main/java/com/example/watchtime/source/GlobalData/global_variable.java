@@ -2,7 +2,8 @@ package com.example.watchtime.source.GlobalData;
 
 import com.example.watchtime.Test_class;
 import com.example.watchtime.source.UIFunction.Timer.TimerProcess;
-import com.example.watchtime.source.ui.Main;
+import com.example.watchtime.source.UI.Main;
+import com.example.watchtime.source.UIFunction.alarm.AlarmProcess;
 import com.example.watchtime.source.UIFunction.world_clock.world_clock_process;
 
 public class global_variable {
@@ -44,7 +45,8 @@ public class global_variable {
      ---------------------------ALARM---------------------------
      */
     public static final String AlarmData = "DATAALARM";
-
+    public static final Class AlarmService = com.example.watchtime.source.UIFunction.alarm.AlarmProcess.class;
+    public static final String AlarmProcessRequest = "Almprocess";
     /**
      *
      --------------------------WORLD CLOCK----------------------------

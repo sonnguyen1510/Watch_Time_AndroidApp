@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Entity
 public class Alarm implements Serializable {
     @NonNull
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey(autoGenerate = true)
     private int ID;
     private String tittle;
     private int Hours;
@@ -18,22 +18,21 @@ public class Alarm implements Serializable {
     private boolean isActive;
     private String Dayactive;
 
-    public Alarm(int ID, String tittle, int hours, int minutes, int alertsong, boolean isActive, String dayactive) {
-        this.ID = ID;
+    public Alarm(String tittle, int Hours, int Minutes, int alertsong, boolean isActive, String Dayactive) {
         this.tittle = tittle;
-        Hours = hours;
-        Minutes = minutes;
+        this.Hours = Hours;
+        this.Minutes = Minutes;
         this.alertsong = alertsong;
         this.isActive = isActive;
-        Dayactive = dayactive;
+        this.Dayactive = Dayactive;
     }
 
     public String getDayactive() {
         return Dayactive;
     }
 
-    public void setDayactive(String dayactive) {
-        Dayactive = dayactive;
+    public void setDayactive(String Dayactive) {
+        this.Dayactive = Dayactive;
     }
 
     public int getAlertsong() {
@@ -49,8 +48,8 @@ public class Alarm implements Serializable {
         return Hours;
     }
 
-    public void setHours(@NonNull int hours) {
-        Hours = hours;
+    public void setHours(@NonNull int Hours) {
+        this.Hours = Hours;
     }
     public String getTittle() {
         return tittle;
@@ -64,8 +63,8 @@ public class Alarm implements Serializable {
         return Minutes;
     }
 
-    public void setMinutes(@NonNull int minutes) {
-        Minutes = minutes;
+    public void setMinutes(@NonNull int Minutes) {
+        this.Minutes = Minutes;
     }
 
 
@@ -81,7 +80,7 @@ public class Alarm implements Serializable {
         return isActive;
     }
 
-    public void setActive(boolean active) {
-        isActive = active;
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
     }
 }

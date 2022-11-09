@@ -16,4 +16,7 @@ public interface alarmQuery {
 
     @Query("Select * from Alarm where ID = :ID")
     List<Alarm> getAlarmByID(int ID);
+
+    @Query("DELETE FROM Alarm where ID = :ID")
+    void deleteAlarmByID(int ID);
 }

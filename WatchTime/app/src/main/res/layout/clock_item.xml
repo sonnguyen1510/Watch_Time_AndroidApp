@@ -4,90 +4,94 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:layout_marginLeft="15dp"
-    android:layout_marginTop="7dp"
+    android:orientation="horizontal"
     android:layout_marginBottom="7dp"
     >
-    <RadioButton
+
+    <CheckBox
         android:id="@+id/choosed_worldClock"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
-        android:visibility="gone"
-        ></RadioButton>
+        android:visibility="gone"></CheckBox>
     <LinearLayout
-        android:id="@+id/world_clock_item"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_marginTop="7dp"
-        android:layout_marginBottom="7dp"
-        >
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
         <LinearLayout
+            android:id="@+id/world_clock_item"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginTop="7dp"
+            android:layout_marginBottom="7dp"
             >
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:id="@+id/Region"
-
-                >
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/TimeZone"
-                    android:textSize="15dp"
-                    android:text="Today, +0HRS">
-
-                </TextView>
-
-                <TextView
-                    android:id="@+id/RegionName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="HA NOI"
-                    android:textSize="20dp"
-                    android:textStyle="bold">
-
-                </TextView>
-            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="end"
+                android:orientation="horizontal"
 
                 >
-
-                <TextView
-                    android:id="@+id/world_time"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginRight="20dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:id="@+id/Region"
 
-                    android:text="06:25"
-                    android:textSize="50dp"
-                    tools:layout_editor_absoluteX="19dp"
-                    tools:layout_editor_absoluteY="22dp" />
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/TimeZone"
+                        android:textSize="15dp"
+                        android:text="Today, +0HRS">
 
-                android:background="?android:attr/listDivider" />
+                    </TextView>
 
+                    <TextView
+                        android:id="@+id/RegionName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="HA NOI"
+                        android:textSize="20dp"
+                        android:textStyle="bold">
+
+                    </TextView>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="right"
+                    >
+
+                    <TextView
+                        android:id="@+id/world_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="20dp"
+                        android:textAlignment="gravity"
+                        android:gravity="right"
+                        android:text="06:25"
+                        android:textSize="50dp"
+                        tools:layout_editor_absoluteX="19dp"
+                        tools:layout_editor_absoluteY="22dp" />
+
+                    android:background="?android:attr/listDivider" />
+                </LinearLayout>
 
             </LinearLayout>
 
+
         </LinearLayout>
-
-
+        <View
+            android:id="@+id/divider3"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="?android:attr/listDivider"
+            ></View>
     </LinearLayout>
-    <View
-        android:id="@+id/divider3"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="?android:attr/listDivider"
-        ></View>
+
+
 
 </LinearLayout>

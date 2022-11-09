@@ -1,6 +1,8 @@
 package com.example.watchtime.source.UIFunction.alarm;
 
 import android.content.Context;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.watchtime.R;
 
 import java.util.List;
+import java.util.zip.Inflater;
 
 public class Repeat_day_adapter extends RecyclerView.Adapter<Repeat_day_adapter.Repeatday> {
     public Context context;
@@ -26,11 +29,20 @@ public class Repeat_day_adapter extends RecyclerView.Adapter<Repeat_day_adapter.
     @NonNull
     @Override
     public Repeatday onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return null;
+        View view = LayoutInflater.from(context).inflate(
+                R.layout.repeatday_item,
+                parent,
+                false
+        );
+        return new Repeatday(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull Repeatday holder, int position) {
+        String WeekDay = Day_of_Week.get(position);
+        holder.repeat_day.setText(WeekDay);
+        holder.repeat_day_icon.setImageResource(R.drawable.ic_baseline_check_24);
+        holder.repeat_day_icon.setVisibility(View.GONE);
 
     }
 
@@ -48,6 +60,22 @@ public class Repeat_day_adapter extends RecyclerView.Adapter<Repeat_day_adapter.
             repeat_day_isChecked = itemView.findViewById(R.id.repeat_day_isChecked);
             repeat_day = itemView.findViewById(R.id.repeat_day);
             repeat_day_icon = itemView.findViewById(R.id.repeat_day_isCheckedicon);
+            repeat_day_isChecked.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(repeat_day_icon.getVisibility() == View.GONE){
+                        repeat_day_icon.setVisibility(View.VISIBLE);
+                        Log.e("","repeat_day_isChecked clicked");
+
+                    }
+                    else{
+                        repeat_day_icon.setVisibility(View.GONE);
+                    }
+
+                }
+            });
         }
     }
+
+
 }

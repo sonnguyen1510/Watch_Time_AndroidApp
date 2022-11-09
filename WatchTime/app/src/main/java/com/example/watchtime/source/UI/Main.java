@@ -1,5 +1,7 @@
-package com.example.watchtime.source.ui;
+package com.example.watchtime.source.UI;
 
+import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,23 +15,31 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.RectF;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
@@ -45,6 +55,7 @@ import com.example.watchtime.R;
 import com.example.watchtime.source.Database.Alarm.Alarm;
 import com.example.watchtime.source.JSON.JSONReader;
 import com.example.watchtime.source.Object.AlarmList;
+import com.example.watchtime.source.Object.Time;
 import com.example.watchtime.source.Object.Timezone;
 import com.example.watchtime.source.GlobalData.function;
 import com.example.watchtime.source.GlobalData.global_variable;
@@ -53,7 +64,9 @@ import com.example.watchtime.source.Database.Timer.AlertSong;
 import com.example.watchtime.source.Object.Timer_data;
 import com.example.watchtime.source.Database.Timer.timeCountdown;
 import com.example.watchtime.source.Database.WorldClock.worldClockList;
+import com.example.watchtime.source.Object.WorldClockList;
 import com.example.watchtime.source.UIFunction.alarm.AlarmAdapter;
+import com.example.watchtime.source.UIFunction.alarm.Repeat_day_adapter;
 import com.example.watchtime.source.UIFunction.world_clock.addWorldClock_adapter;
 import com.example.watchtime.source.UIFunction.world_clock.world_clock_adapter;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -62,7 +75,10 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class Main extends AppCompatActivity implements Serializable {
     /**
@@ -73,6 +89,7 @@ public class Main extends AppCompatActivity implements Serializable {
     public LinearLayout Alarm;
     private int menuToChoose = 0;
     private ViewFlipper LayoutChange;
+    private Menu optionsMenu;
     /**
      * ********************************TIMER****************************
      */
@@ -80,7 +97,7 @@ public class Main extends AppCompatActivity implements Serializable {
     public Button cancel_timer;
 
 
-    public Timer_data data;
+    public Timer_data timer_data;
     public ProgressBar PercentTimeLeft;
     public TextView ShowTimeLeft;
 
@@ -113,7 +130,7 @@ public class Main extends AppCompatActivity implements Serializable {
      * ********************************WORLD CLOCK***************************
      */
     public world_clock_adapter world_clock_adapter;
-    public List<worldClockList> worldClock_data;
+    public WorldClockList worldClock_data;
     public RecyclerView showWorldClock;
     //Add world clock
     public BottomSheetDialog addWorldClock;
@@ -128,6 +145,11 @@ public class Main extends AppCompatActivity implements Serializable {
     public AlarmAdapter alarm_adapter;
     //AddAlarm
     public BottomSheetDialog addAlarm;
+    public String title;
+    public int Alarm_hour;
+    public int Alarm_minutes;
+    public int Alarm_Sound;
+    public String Alarm_repeatDay;
     //DATABASE
     /**
      * CONTENT
@@ -144,14 +166,18 @@ public class Main extends AppCompatActivity implements Serializable {
         @Override
         public void onReceive(Context context, Intent intent) {
             String Request = intent.getStringExtra(global_variable.Request);
-
+            ///--------------------------------------World Clock--------------------------
             if (Request.equalsIgnoreCase("isUpdateClock")) {
-                UpdateClock();
-            } else if (Request.equalsIgnoreCase("isAddClock")) {
+                Time updateTime = (Time) intent.getSerializableExtra("Clock");
+                UpdateClock(updateTime);
+                Log.e("Main","worldClock Update");
+            }
+            else if (Request.equalsIgnoreCase("isAddClock")) {
                 Timezone.zones region = (Timezone.zones) intent.getSerializableExtra("Region");
                 if (DataStore.getInstance(Main.this).worldClockListQuery().getWorldClockByRegion(region.name) == null) {
 
-                    worldClockList newWorldClock = new worldClockList(region.value, region.name);
+                    TimeZone tz = TimeZone.getTimeZone(region.value);
+                    worldClockList newWorldClock = new worldClockList(region.value,tz.getOffset(new Date().getTime())/1000/60/60,region.name);
 
                     worldClock_data.add(newWorldClock);
                     DataStore.getInstance(Main.this).worldClockListQuery().InsertWorldClock(newWorldClock);
@@ -160,6 +186,8 @@ public class Main extends AppCompatActivity implements Serializable {
                     if(addWorldClock.isShowing()){
                         addWorldClock.dismiss();
                     }
+
+
                 } else {
                     Toast.makeText(Main.this, "This world clock has been added !", Toast.LENGTH_LONG);
                 }
@@ -169,8 +197,60 @@ public class Main extends AppCompatActivity implements Serializable {
                 startTimerLayoutChange();
                 ShowTimeLeft.setText(datatime);
             }
+            else if (Request.equalsIgnoreCase("updateWorldClockMenu")){
+                int count = 0;
+                MenuItem delete = optionsMenu.findItem(R.id.DeleteSecletedWorldClock);
+                MenuItem edit = optionsMenu.findItem(R.id.world_clock_edit);
+
+                for(int position = 0 ; position < worldClock_data.size(); position ++){
+                    View WCCheck = showWorldClock.getLayoutManager().findViewByPosition(position);
+                    CheckBox WC_checked = WCCheck.findViewById(R.id.choosed_worldClock);
+
+                    if(WC_checked.isChecked()){
+                        count++;
+                        break;
+                    }
+                }
+
+                if(count > 0){
+                    delete.setVisible(true);
+                    edit.setVisible(false);
+                }
+                else{
+                    delete.setVisible(false);
+                    edit.setVisible(true);
+                }
+            }
+            ///----------------------------------ALARM-------------------------------------
+            else if(Request.equalsIgnoreCase("RepeatDay")){
+
+            }
             else if(Request.equalsIgnoreCase("AddAlarm")){
 
+            }
+            else if (Request.equalsIgnoreCase("updateAlarmMenu")){
+                int count = 0;
+                MenuItem delete = optionsMenu.findItem(R.id.DeleteSecletedAlarm);
+                MenuItem edit = optionsMenu.findItem(R.id.alarm_edit_menu);
+
+                for(int position = 0 ; position < listAlarm.size(); position ++){
+                    View AlarmCheck = showAlarm.getLayoutManager().findViewByPosition(position);
+                    CheckBox Alarm_checked = AlarmCheck.findViewById(R.id.Alarm_isChecked);
+
+                    if(Alarm_checked.isChecked()){
+                        count++;
+                        break;
+                    }
+                }
+
+                if(count > 0){
+                    delete.setVisible(true);
+                    edit.setVisible(false);
+                }
+                else{
+                    delete.setVisible(false);
+                    edit.setVisible(true);
+                }
             }
 
         }
@@ -206,7 +286,9 @@ public class Main extends AppCompatActivity implements Serializable {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.main);
+
         /**
          * RUN APP FIRST TIME
          */
@@ -366,15 +448,15 @@ public class Main extends AppCompatActivity implements Serializable {
                 int minutes = mCurrentMinute;
                 int seconds = mCurrentSeconds;
 
-                data = new Timer_data();
-                data.totalTime = function.Timer.toMilisecond(hours, minutes, seconds);
-                data.hour = mCurrentHour;
-                data.minute = mCurrentMinute;
-                data.second = mCurrentSeconds;
+                timer_data = new Timer_data();
+                timer_data.totalTime = function.Timer.toMilisecond(hours, minutes, seconds);
+                timer_data.hour = mCurrentHour;
+                timer_data.minute = mCurrentMinute;
+                timer_data.second = mCurrentSeconds;
                 //alert song
-                data.AlertSong = DefaultSong;
+                timer_data.AlertSong = DefaultSong;
 
-                DataStore.getInstance(Main.this).timeCountdownQuery().storeTimeLeft(new timeCountdown(global_variable.TimerID, data.totalTime, data.totalTime));
+                DataStore.getInstance(Main.this).timeCountdownQuery().storeTimeLeft(new timeCountdown(global_variable.TimerID, timer_data.totalTime, timer_data.totalTime));
                 startTimer();
                 //onCountdown();
             }
@@ -396,8 +478,15 @@ public class Main extends AppCompatActivity implements Serializable {
          */
         //------------------LOAD WORLD CLOCK LIST-------------------------------
         //Load world clock
+        Date current = Calendar.getInstance().getTime();
+        worldClock_data = new WorldClockList(new Time(current));
+
         showWorldClock = findViewById(R.id.worldClock_list);
-        worldClock_data = DataStore.getInstance(this).worldClockListQuery().getAllWorldClock();
+        List<worldClockList> wc_data  = DataStore.getInstance(this).worldClockListQuery().getAllWorldClock();
+        for (worldClockList i : wc_data){
+            worldClock_data.add(i);
+        }
+
         world_clock_adapter = new world_clock_adapter(worldClock_data, this);
 
         showWorldClock.setAdapter(world_clock_adapter);
@@ -434,7 +523,8 @@ public class Main extends AppCompatActivity implements Serializable {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         DataStore.getInstance(Main.this).worldClockListQuery().deleteWorldClock(worldClock_data.get(position).getID());
-                                        world_clock_adapter.notifyItemRemoved(position);
+                                        worldClock_data.remove(position);
+                                        world_clock_adapter.notifyItemChanged(position);
                                     }
                                 })
                                 .create().show();
@@ -488,16 +578,18 @@ public class Main extends AppCompatActivity implements Serializable {
         /**
          *-------------------------------ALARM-------------------------------------------
          */
-            try {
+
             List<com.example.watchtime.source.Database.Alarm.Alarm> lsAlarm = DataStore.getInstance(this).alarmListQuery().getAllAlarm();
+            showAlarm = findViewById(R.id.alarm_list);
+
             listAlarm = new AlarmList(lsAlarm);
             alarm_adapter  = new AlarmAdapter(listAlarm,this);
             showAlarm.setAdapter(alarm_adapter);
             showAlarm.setLayoutManager(new LinearLayoutManager(this));
-            }catch (Exception e){
-                e.printStackTrace();
-                Toast.makeText(this,"Can't get alarm data", Toast.LENGTH_LONG);
-            }
+            StartAlarmProcess(this);
+
+                //Toast.makeText(this,"Can't get alarm data", Toast.LENGTH_LONG);
+
 
         ItemTouchHelper.SimpleCallback simpleItemTouchCallbackForAlarmItem = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
@@ -522,8 +614,9 @@ public class Main extends AppCompatActivity implements Serializable {
                                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        DataStore.getInstance(Main.this).worldClockListQuery().deleteWorldClock(worldClock_data.get(position).getID());
-                                        alarm_adapter.notifyItemRemoved(position);
+                                        DataStore.getInstance(Main.this).worldClockListQuery().deleteWorldClock(listAlarm.get(position).getID());
+                                        listAlarm.detete(position);
+                                        alarm_adapter.notifyItemChanged(position);
                                     }
                                 })
                                 .create().show();
@@ -570,22 +663,26 @@ public class Main extends AppCompatActivity implements Serializable {
             }
         };
 
-
         ItemTouchHelper itemTouchHelperForAlarmItem = new ItemTouchHelper(simpleItemTouchCallbackForAlarmItem );
         itemTouchHelperForAlarmItem.attachToRecyclerView(showAlarm);
 
-
     }
-
-
-
 
     @Override
     protected void onStop() {
         super.onStop();
         unregisterReceiver(TimerBroadcastReciver);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        StopWorldClockService();
+    }
+
     /**
+     * -------------------------------------------------------------------------------------
+     * -------------------------------------------------------------------------------------
      *-------------------------------MENU FUNCTION-------------------------------------------
      */
     private void TimerMenu() {
@@ -597,7 +694,7 @@ public class Main extends AppCompatActivity implements Serializable {
         invalidateOptionsMenu();
     }
     private void WorldClockMenu() {
-        menuToChoose = R.menu.addworldclock;
+        menuToChoose = R.menu.worldclock;
         invalidateOptionsMenu();
     }
     private void ClearOptionChoice() {
@@ -610,7 +707,8 @@ public class Main extends AppCompatActivity implements Serializable {
         WorldClockImage.setImageResource(R.drawable.ic_baseline_world);
     }
 
-    private void UpdateClock() {
+    private void UpdateClock(Time updateTime) {
+        worldClock_data.UpdateTime(updateTime);
         world_clock_adapter.notifyDataSetChanged();
     }
 
@@ -618,6 +716,7 @@ public class Main extends AppCompatActivity implements Serializable {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(menuToChoose, menu);
+        optionsMenu = menu;
         return true;
     }
 
@@ -627,31 +726,113 @@ public class Main extends AppCompatActivity implements Serializable {
             case R.id.add_worldClockmenu:
                 openAddworldClockWindow(this);
                 return true;
+                //Alarm-------------------------------------
             case R.id.add_Alarm:
                 openAddAlarmWindow(this);
+                return true;
+            case R.id.alarm_edit_menu:
+                EditAlarm(this);
+                return true;
+            case R.id.DeleteSecletedAlarm:
+                DeleteAlarmSelected(this);
+                return true;
+            //World Clock------------------------------------
+            case R.id.world_clock_edit:
+                EditWorldClock(this);
+                return true;
+            case R.id.DeleteSecletedWorldClock:
+                DeleteWorldClockSelected(this);
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void openAddAlarmWindow(Main main) {
+    private void WorldClockMenuChange(Menu menu){
+        MenuItem delete = menu.findItem(R.id.DeleteSecletedWorldClock);
+        MenuItem edit = menu.findItem(R.id.world_clock_edit);
+
+
+        if(delete.isVisible()){
+            delete.setVisible(false);
+            edit.setVisible(true);
+        }
+        else{
+            delete.setVisible(true);
+            edit.setVisible(false);
+        }
+    }
+
+    private void AlarmMenuChange(Menu menu){
+        MenuItem delete = menu.findItem(R.id.DeleteSecletedAlarm);
+        MenuItem edit = menu.findItem(R.id.alarm_edit_menu);
+
+
+        if(delete.isVisible()){
+            delete.setVisible(false);
+            edit.setVisible(true);
+        }
+        else{
+            delete.setVisible(true);
+            edit.setVisible(false);
+        }
+    }
+
+    /**
+     *-------------------------------ALARM FUNCTION-------------------------------------------
+     */
+    private void StartAlarmProcess(Context context){
+        Intent startAlarm = new Intent(this, global_variable.AlarmService);
+        //Send time data
+        //Log.e("",data.getData().getTotalTime()+"");
+        startAlarm.putExtra("Alarm_data", (Serializable) listAlarm);
+        startService(startAlarm);
+    }
+
+    private void openAddAlarmWindow(Context context) {
         /**
          * SHOW POPUP WINDOWN
          * */
-        BottomSheetDialog addAlarm = new BottomSheetDialog(Main.this, R.style.BottomSheetStyle);
+        addAlarm = new BottomSheetDialog(Main.this, R.style.BottomSheetStyle);
         BottomSheetBehavior<View> bottomSheetBehavior;
-        View sheetview = LayoutInflater.from(getApplicationContext()).inflate(R.layout.add_alarm, (LinearLayout) findViewById(R.id.add_Alarm_layout));
+        View sheetview = LayoutInflater.from(context).inflate(R.layout.add_alarm, (LinearLayout) findViewById(R.id.add_Alarm_layout));
 
 
         //Set up view
+
         sheetview.findViewById(R.id.add_Alarm_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addAlarm.dismiss();
             }
         });
+        //-----SETUP TIME-----------------
+
+
+        sheetview.findViewById(R.id.alarm_timeSetting).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        Alarm_hour = hourOfDay;
+                        Alarm_minutes = minute;
+                        TextView showTime =sheetview.findViewById(R.id.ShowAlarmTime);
+                        if(minute < 10){
+                            showTime.setText(Alarm_hour+":0"+Alarm_minutes);
+                        }
+                        else
+                            showTime.setText(Alarm_hour+":"+Alarm_minutes);
+                    }
+                };
+                TimePickerDialog alarmTime = new TimePickerDialog(v.getContext(),onTimeSetListener,Alarm_hour,Alarm_minutes,true);
+                alarmTime.setTitle("Set alarm time");
+                alarmTime.show();
+            }
+        });
+
 
         //-----SETUP REPEATE DAY-----------------
+        Alarm_repeatDay = "";
         List<String> listDay = new ArrayList<>();
         listDay.add("Monday");
         listDay.add("Tuesday");
@@ -660,14 +841,58 @@ public class Main extends AppCompatActivity implements Serializable {
         listDay.add("Friday");
         listDay.add("Saturday");
         listDay.add("Sunday");
-        AutoCompleteTextView repeatdaychoosed = findViewById(R.id.alarm_Repeat_time);
-        String choosedDay = new String();
+        EditText repeatdaychoosed = sheetview.findViewById(R.id.Repeat_time_choosed);
         //RecyclerView.Adapter<> RepeatDay = new
-        openChooseRepeatDay();
+        repeatdaychoosed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Dialog chooseRepeatDay = new Dialog(view.getContext());
+                chooseRepeatDay.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                chooseRepeatDay.setContentView(R.layout.alarm_repearday);
+                Window RepeatDaywindow = chooseRepeatDay.getWindow();
+                if(RepeatDaywindow == null){
+                    Toast.makeText(view.getContext(),"We have some error , please reset the app and try again !",Toast.LENGTH_LONG);
+                }
+                RepeatDaywindow.setLayout(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.MATCH_PARENT);
+                RepeatDaywindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                WindowManager.LayoutParams windownAttribute = RepeatDaywindow.getAttributes();
+                windownAttribute.gravity = Gravity.CENTER;
+                RepeatDaywindow.setAttributes(windownAttribute);
+                //custom dialog view
+                Repeat_day_adapter repeat_day_adapter = new Repeat_day_adapter(view.getContext(),listDay);
+                RecyclerView showRepeatList = chooseRepeatDay.findViewById(R.id.Show_repeatDay);
+                showRepeatList.setAdapter(repeat_day_adapter);
+                showRepeatList.setLayoutManager(new LinearLayoutManager(sheetview.getContext()));
+
+                chooseRepeatDay.findViewById(R.id.select_Alarm_repeatday).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Alarm_repeatDay = "";
+                        for(int position = 0 ; position < listDay.size();position++){
+                            View RepeatDayCheck = showRepeatList.getLayoutManager().findViewByPosition(position);
+                            TextView repeat_day = RepeatDayCheck.findViewById(R.id.repeat_day);
+                            ImageView repeat_day_icon = RepeatDayCheck.findViewById(R.id.repeat_day_isCheckedicon);
+                            if(repeat_day_icon.getVisibility() == View.VISIBLE){
+                                Alarm_repeatDay+=repeat_day.getText()+",";
+                            }
+                        }
+                        //View icon = viewItem.findViewById(R.id.view);
+                        EditText showRepeatDay = sheetview.findViewById(R.id.Repeat_time_choosed);
+                        //Remove "," in last string
+                        Alarm_repeatDay = function.removeLastChar(Alarm_repeatDay);
+                        showRepeatDay.setText(Alarm_repeatDay);
+                        chooseRepeatDay.dismiss();
+                    }
+                });
+
+                chooseRepeatDay.show();
+            }
+        });
+
         //-----SETUP DROPDOWN ALERT SONG MENU--------------
-        AutoCompleteTextView alertsongChoosed = findViewById(R.id.alarm_sound_choosed);
+        AutoCompleteTextView alertsongChoosed = sheetview.findViewById(R.id.alarm_sound_choosed);
         ListSong = DataStore.getInstance(this).alertSongQuery().getAllAlertsong();
-        int[] ChoosedSong = {0};
 
         alertsongAdapter = new ArrayAdapter<>(this, R.layout.alertsong_dropdownitem, ListSong);
         alertsongChoosed.setAdapter(alertsongAdapter);
@@ -676,13 +901,41 @@ public class Main extends AppCompatActivity implements Serializable {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String item = parent.getItemAtPosition(position).toString();
                 try {
-                    ChoosedSong[0] = DataStore.getInstance(view.getContext()).alertSongQuery().getAlertSong(item);
+                    Alarm_Sound = DataStore.getInstance(view.getContext()).alertSongQuery().getAlertSong(item);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         });
+        //-----------------SETUP TITTLE-------------
+        EditText Almtitle = sheetview.findViewById(R.id.alarm_tittle_choosed);
 
+        //-----------------------------------------------------------------------------
+
+        sheetview.findViewById(R.id.add_Alarm_Save).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.e("Save","Save alarm");
+                com.example.watchtime.source.Database.Alarm.Alarm newAlarm = new Alarm(
+                        Almtitle.getText().toString(),
+                        Alarm_hour,
+                        Alarm_minutes,
+                        Alarm_Sound,
+                        true,
+                        Alarm_repeatDay
+                );
+
+                DataStore.getInstance(sheetview.getContext()).alarmListQuery().createNewAlarm(newAlarm);
+                Log.e("Time",Alarm_hour+" "+Alarm_minutes);
+                listAlarm.addNewAlarm(newAlarm);
+                alarm_adapter.notifyDataSetChanged();
+                addAlarm.dismiss();
+            }
+        });
+
+        addAlarm.setContentView(sheetview);
+        bottomSheetBehavior = BottomSheetBehavior.from((View) sheetview.getParent());
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
         //Set min heigh
         LinearLayout layout =  sheetview.findViewById(R.id.add_Alarm_layout);
@@ -695,15 +948,53 @@ public class Main extends AppCompatActivity implements Serializable {
 
     }
 
-    /**
-     *-------------------------------ALARM FUNCTION-------------------------------------------
-     */
+    private void  DeleteAlarmSelected(Context context){
+        for(int position = 0 ; position < listAlarm.size();position++){
+            View AlarmCheck = showAlarm.getLayoutManager().findViewByPosition(position);
+            CheckBox Alarm_checked = AlarmCheck.findViewById(R.id.Alarm_isChecked);
+            if(Alarm_checked.isChecked()){
+                Alarm data = listAlarm.get(position);
+                listAlarm.detete(position);
+                DataStore.getInstance(this).alarmListQuery().deleteAlarmByID(data.getID());
+                EditAlarm(context);
+                alarm_adapter.notifyDataSetChanged();
+            }
+        }
 
-
-
-    private void openChooseRepeatDay() {
+        Intent SendUpdateAlarmData = new Intent();
+        SendUpdateAlarmData.setAction("com.example.watchtime.source.ui.Alarm");
+        SendUpdateAlarmData.putExtra(global_variable.AlarmProcessRequest,"isUpdateAlarm");
+        SendUpdateAlarmData.putExtra("UpdateData",listAlarm);
+        sendBroadcast(SendUpdateAlarmData);
     }
 
+    private void EditAlarm(Context context) {
+        if(alarm_adapter != null){
+            for(int position = 0 ; position < listAlarm.size();position++){
+                View AlarmCheck = showAlarm.getLayoutManager().findViewByPosition(position);
+                CheckBox Alarm_checked = AlarmCheck.findViewById(R.id.Alarm_isChecked);
+                ImageView Alarm_edit_button = AlarmCheck.findViewById(R.id.Edit_Alarm);
+                Switch alarmActive = AlarmCheck.findViewById(R.id.active_alarm);
+                ;
+                if(Alarm_checked.getVisibility() == View.GONE){
+                    Alarm_checked.setVisibility(View.VISIBLE);
+                }
+                else{
+                    Alarm_checked.setVisibility(View.GONE);
+                }
+
+                if(alarmActive.getVisibility()==View.GONE){
+                    Alarm_checked.setChecked(false);
+                    Alarm_edit_button.setVisibility(View.GONE);
+                    alarmActive.setVisibility(View.VISIBLE);
+                }
+                else{
+                    Alarm_edit_button.setVisibility(View.VISIBLE);
+                    alarmActive.setVisibility(View.GONE);
+                }
+            }
+        }
+    }
 
     //------------------------------------------LAYOUT CHANGE------------------------------------
     private void startTimerLayoutChange() {
@@ -731,6 +1022,7 @@ public class Main extends AppCompatActivity implements Serializable {
         setCurrentMinute(0);
         setCurrentSecond(0);
     }
+
 
     //------------------------------------------TIME CHANGE------------------------------------
     private void setCurrentSecond(int currentSecond) {
@@ -784,11 +1076,11 @@ public class Main extends AppCompatActivity implements Serializable {
         Intent startTimer = new Intent(this, global_variable.TimerService);
         //Send time data
         //Log.e("",data.getData().getTotalTime()+"");
-        startTimer.putExtra("Timer_data", (Serializable) data);
+        startTimer.putExtra("Timer_data", (Serializable) timer_data);
         startService(startTimer);
     }
 
-    //---------------------------------WOLRD CLOCK------------------------
+    /**---------------------------------WOLRD CLOCK------------------------*/
     //https://www.youtube.com/watch?v=kzq9uoTC590
     private Object getTimezoneData(int jsonfile, Context context) {
         JSONReader data = new JSONReader();
@@ -796,6 +1088,47 @@ public class Main extends AppCompatActivity implements Serializable {
 
         return timezonesData;
     }
+    private void StartWorldClockService(){
+        Intent startWC = new Intent(this, global_variable.worldClockService);
+        //Send time data
+        //Log.e("",data.getData().getTotalTime()+"");
+        //startWC.putExtra("Current", (Serializable) Time);
+        startService(startWC);
+    }
+
+    private void StopWorldClockService(){
+        stopService(new Intent(this, global_variable.worldClockService));
+    }
+
+    private void EditWorldClock(Context context){
+        if(world_clock_adapter != null){
+            for(int position = 0 ; position < worldClock_data.size();position++) {
+                View WorldClockCheck = showWorldClock.getLayoutManager().findViewByPosition(position);
+                CheckBox WorldClock_checked = WorldClockCheck.findViewById(R.id.Alarm_isChecked);
+                if(WorldClock_checked.getVisibility() == View.GONE){
+                    WorldClock_checked.setVisibility(View.VISIBLE);
+                }
+                else
+                    WorldClock_checked.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private void  DeleteWorldClockSelected(Context context){
+        for(int position = 0 ; position < worldClock_data.size();position++) {
+            View WorldClockCheck = showWorldClock.getLayoutManager().findViewByPosition(position);
+            CheckBox WorldClock_checked = WorldClockCheck.findViewById(R.id.Alarm_isChecked);
+            if(WorldClock_checked.isChecked()){
+                DataStore.getInstance(context).worldClockListQuery().deleteWorldClock(worldClock_data.get(position).getID());
+                worldClock_data.remove(position);
+                EditWorldClock(context);
+                world_clock_adapter.notifyDataSetChanged();
+                WorldClockMenuChange(optionsMenu);
+            }
+
+        }
+    }
+
     private void openAddworldClockWindow(Context main) {
         //https://www.youtube.com/watch?v=hclp2377fDQ
         /**

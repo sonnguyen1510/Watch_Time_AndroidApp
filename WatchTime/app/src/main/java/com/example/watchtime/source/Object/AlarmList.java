@@ -2,6 +2,7 @@ package com.example.watchtime.source.Object;
 
 import com.example.watchtime.source.Database.Alarm.Alarm;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class AlarmList {
+public class AlarmList implements Serializable {
     private TreeMap<Integer,Alarm> alarmList = new TreeMap<>();
 
     public AlarmList(List<Alarm> alarmList) {
@@ -85,14 +86,24 @@ public class AlarmList {
     }
 
     public Alarm get(int position) {
-        Set<Map.Entry<Integer,Alarm> > entrySet = alarmList.entrySet();
-
-        // Converting entrySet to ArrayList
-        List<Map.Entry<Integer,Alarm> > entryList = new ArrayList<>(entrySet);
-        return (Alarm) entryList.get(position);
+        return (Alarm) alarmList.values().toArray()[position];
     }
 
+    public int getKey(int position){
+        return (int) alarmList.keySet().toArray()[position];
+    }
     public int size() {
         return alarmList.size();
+    }
+
+    public boolean detete(int position){
+        if(position >= this.size()){
+            return false;
+        }
+        else{
+
+            this.alarmList.remove(this.getKey(position));
+            return true;
+        }
     }
 }

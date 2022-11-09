@@ -64,26 +64,27 @@ public class Time {
     }
 
     public boolean IsNextMinutes(){
-        if(this.second++ == 59){
+        if(this.second == 59){
             if(this.minute== 59){
                 if(this.hour == 23) {
                     this.hour = 0;
                     this.minute = 0;
                     this.second = 0;
                 }
-                else
+                else{
+                    this.minute = 0;
+                    this.second = 0;
                     this.hour ++;
-
+                }
             }
             else{
-                this.minute = 0;
+                this.minute++;
                 this.second = 0;
             }
-            this.minute++;
-            this.second = 0;
             return true;
         }
         else
+            this.second ++;
             return false;
     }
 
@@ -91,4 +92,7 @@ public class Time {
         return function.Timer.FormatTime(this.hour,this.minute);
     }
 
+    public Time getTime() {
+        return this;
+    }
 }

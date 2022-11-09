@@ -10,8 +10,7 @@
         >
         <ViewFlipper
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight=".91"
+            android:layout_height="match_parent"
             android:id="@+id/UIFunction"
             >
             <include layout="@layout/world_clock"></include>
@@ -19,15 +18,15 @@
             <include layout="@layout/timer"></include>
 
         </ViewFlipper>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight=".095"
-            >
-            <include
-                layout="@layout/function_bar"/>
 
-        </LinearLayout>
     </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        >
+        <include
+            layout="@layout/function_bar"/>
+    </RelativeLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>

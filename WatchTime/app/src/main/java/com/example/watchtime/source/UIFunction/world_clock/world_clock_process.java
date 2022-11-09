@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import com.example.watchtime.source.Object.Time;
 import com.example.watchtime.source.GlobalData.global_variable;
 
+import java.io.Serializable;
 import java.util.Calendar;
 
 public class world_clock_process extends Service {
@@ -26,17 +27,18 @@ public class world_clock_process extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        int UTCtime = intent.getIntExtra("worldClock_data",0);
+        //int UTCtime = intent.getIntExtra("worldClock_data",0);
         Log.e("In world clock Thread","");
         Thread thread = new Thread() {
             @Override
             public void run() {
                 try {
+                    Time runTime = new Time(Calendar.getInstance().getTime());
                     while (!isInterrupted()) {
                         Thread.sleep(1000);
-                        Time runTime = new Time(Calendar.getInstance().getTime());
+
                         if(runTime.IsNextMinutes()){
-                            UpdateTimeAlert();
+                            UpdateTimeAlert(runTime.getTime());
                             Log.e("In world clock Thread","Update");
                         }
                         Log.e("In world clock Thread",runTime.toStringTime());
@@ -52,10 +54,11 @@ public class world_clock_process extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void UpdateTimeAlert() {
+    private void UpdateTimeAlert(Time time) {
         Intent SendTimeData = new Intent();
-        SendTimeData.setAction("com.example.watchtime.source.ui.Time.worldClock");
-        SendTimeData.putExtra(global_variable.WorldClockUpdate,"isUpdateClock");
+        SendTimeData.setAction("com.example.watchtime.source.ui.Time");
+        SendTimeData.putExtra(global_variable.Request,"isUpdateClock");
+        SendTimeData.putExtra("Clock",(Serializable) time);
         sendBroadcast(SendTimeData);
     }
 

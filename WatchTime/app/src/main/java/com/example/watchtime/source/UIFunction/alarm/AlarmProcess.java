@@ -28,12 +28,13 @@ public class AlarmProcess extends Service{
     BroadcastReceiver getNewAlarm = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Alarm newAlarmdata = (Alarm) intent.getSerializableExtra(global_variable.AlarmData);
-            String action = intent.getStringExtra("Action");
-            if(action.equalsIgnoreCase("AddAlarm")){
-                if(newAlarmdata != null){
-                    data.addNewAlarm(newAlarmdata);
-                }
+
+            String action = intent.getStringExtra(global_variable.AlarmProcessRequest);
+            if(action.equalsIgnoreCase("isUpdateAlarm")){
+                Date current = Calendar.getInstance().getTime();
+                data = (AlarmList) intent.getSerializableExtra("UpdateData");
+                nextAlarm = data.getClosestAlarmHigh(current.getHours(),current.getMinutes());
+
             }else if(action.equalsIgnoreCase("UpdateState")){
                 //int ID = (Alarm) intent.getSerializableExtra(global_variable.AlarmData);
             }
@@ -58,6 +59,11 @@ public class AlarmProcess extends Service{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if(data != null){
+            Date current = Calendar.getInstance().getTime();
+            data = (AlarmList) intent.getSerializableExtra("Alarm_data");
+            nextAlarm = data.getClosestAlarmHigh(current.getHours(),current.getMinutes());
+        }
 
         //Run alarm
         Timer t = new Timer();
@@ -65,20 +71,22 @@ public class AlarmProcess extends Service{
             @Override
             public void run() {
                 Date currentTime = Calendar.getInstance().getTime();
-                if(currentTime.getHours() == nextAlarm.getHours() && currentTime.getMinutes() == nextAlarm.getMinutes()){
-                    if(nextAlarm.isActive()) {
-                        //play alert song
-                        if (!mediaPlayer.isPlaying()) {
-                            alert(nextAlarm.getAlertsong());
+                if(!(nextAlarm == null)){
+                    if(currentTime.getHours() == nextAlarm.getHours() && currentTime.getMinutes() == nextAlarm.getMinutes()){
+                        if(nextAlarm.isActive()) {
+                            //play alert song
+                            if (!mediaPlayer.isPlaying()) {
+                                alert(nextAlarm.getAlertsong());
+                            }
+                            //if
                         }
-                        //if
-                    }
-                    else {
-                        nextAlarm = data.getClosestAlarmHigh(currentTime.getHours(),currentTime.getMinutes());
-                    }
-                }else{
-                    if(mediaPlayer.isPlaying()){
-                        mediaPlayer.stop();
+                        else {
+                            nextAlarm = data.getClosestAlarmHigh(currentTime.getHours(),currentTime.getMinutes());
+                        }
+                    }else{
+                        if(mediaPlayer.isPlaying()){
+                            mediaPlayer.stop();
+                        }
                     }
                 }
 
