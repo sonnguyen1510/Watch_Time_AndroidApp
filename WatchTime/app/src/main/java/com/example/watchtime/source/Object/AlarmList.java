@@ -106,4 +106,8 @@ public class AlarmList implements Serializable {
             return true;
         }
     }
+
+    public void detete(Alarm delete) {
+        this.alarmList.remove(this.mergeMinuteAndHourForCheck(delete));
+    }
 }

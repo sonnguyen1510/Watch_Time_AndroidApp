@@ -252,6 +252,11 @@ public class Main extends AppCompatActivity implements Serializable {
                     edit.setVisible(true);
                 }
             }
+            else if (Request.equalsIgnoreCase("DeleteAlarm")){
+                Alarm delete = (com.example.watchtime.source.Database.Alarm.Alarm) intent.getSerializableExtra("Delete");
+                listAlarm.detete(delete);
+                DataStore.getInstance(Main.this).alarmListQuery().deleteAlarmByID(delete.getID());
+            }
 
         }
     };

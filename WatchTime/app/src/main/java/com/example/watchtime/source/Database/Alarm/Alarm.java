@@ -27,6 +27,15 @@ public class Alarm implements Serializable {
         this.Dayactive = Dayactive;
     }
 
+    public Alarm (Alarm alarm){
+        this.tittle = alarm.getTittle();
+        this.Hours = alarm.getHours();
+        this.Minutes = alarm.getMinutes();
+        this.alertsong = alarm.getAlertsong();
+        this.isActive = alarm.isActive();
+        this.Dayactive = alarm.getDayactive();
+    }
+
     public String getDayactive() {
         return Dayactive;
     }
