@@ -54,6 +54,7 @@ import java.util.List;
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
     private AlarmList data ;
     private Context context;
+    private BottomSheetDialog EditAlarm;
 
     public AlarmAdapter(AlarmList data , Context context) {
         this.data = data;
@@ -147,10 +148,11 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
         holder.Edit_Alarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 /**
                  * SHOW POPUP WINDOWN
                  * */
-                BottomSheetDialog EditAlarm = new BottomSheetDialog(v.getContext(), R.style.BottomSheetStyle);
+                EditAlarm = new BottomSheetDialog(v.getContext(), R.style.BottomSheetStyle);
                 BottomSheetBehavior<View> bottomSheetBehavior;
                 View sheetview = LayoutInflater.from(v.getContext()).inflate(R.layout.add_alarm, (LinearLayout) v.findViewById(R.id.add_Alarm_layout));
 
@@ -163,6 +165,9 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
                         EditAlarm.dismiss();
                     }
                 });
+
+                TextView title = sheetview.findViewById(R.id.alarm_function_title);
+                title.setText("");
                 //-----SETUP TIME-----------------
 
                 sheetview.findViewById(R.id.alarm_timeSetting).setOnClickListener(new View.OnClickListener() {
@@ -277,7 +282,37 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
                 });
                 //-----------------SETUP TITTLE-------------
                 EditText Almtitle = sheetview.findViewById(R.id.alarm_tittle_choosed);
+                Almtitle.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Dialog dialog = new Dialog(v.getContext());
+                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                        dialog.setContentView(R.layout.settitle_dialog);
 
+                        Window window = dialog.getWindow();
+
+                        if(window!= null){
+                            window.setLayout(WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT);
+                            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                            WindowManager.LayoutParams windowAttribute  = window.getAttributes();
+                            windowAttribute.gravity = Gravity.CENTER;
+                            window.setAttributes(windowAttribute);
+
+                            //Save title
+                            EditText inputTittle = dialog.findViewById(R.id.alarm_settittle_title);
+                            inputTittle.setText(alarmData.getTittle());
+
+                            dialog.findViewById(R.id.alarm_settittle_savetitle).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    newAlarm.setTittle( inputTittle.getText().toString());
+                                    dialog.dismiss();
+                                }
+                            });
+                        }
+                        dialog.show();
+                    }
+                });
                 //-----------------------------------------------------------------------------
 
                 sheetview.findViewById(R.id.add_Alarm_Save).setOnClickListener(new View.OnClickListener() {
@@ -312,6 +347,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
             }
         });
 
+        /*
         holder.deleteAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -327,6 +363,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
                                 SendTimeData.putExtra("AlarmID",alarmData.getID());
                                 SendTimeData.putExtra("Delete",(Serializable) alarmData);
                                 v.getContext().sendBroadcast(SendTimeData);
+                                EditAlarm.dismiss();
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -340,6 +377,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
                         .show();
             }
         });
+        * */
     }
     private void ChangeRepeat_dayActive(TextView textView){
         textView.setTextColor(Color.parseColor("#FFFFFF"));

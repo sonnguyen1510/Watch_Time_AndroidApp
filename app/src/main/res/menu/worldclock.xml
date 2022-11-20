@@ -8,6 +8,12 @@
         android:icon="@drawable/ic_baseline_add_alarm_24"
         />
 
+    <item
+        android:title="Delete All"
+        app:showAsAction="always"
+        android:visible="false"
+        android:id="@+id/world_clock_delete_all"
+        />
     <item android:id="@+id/world_clock_edit"
         app:showAsAction="always"
         android:title="Edit"

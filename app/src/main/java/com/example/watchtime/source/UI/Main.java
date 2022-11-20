@@ -145,7 +145,7 @@ public class Main extends AppCompatActivity implements Serializable {
     public AlarmAdapter alarm_adapter;
     //AddAlarm
     public BottomSheetDialog addAlarm;
-    public String title;
+    public String Alarm_title;
     public int Alarm_hour;
     public int Alarm_minutes;
     public int Alarm_Sound;
@@ -596,81 +596,6 @@ public class Main extends AppCompatActivity implements Serializable {
                 //Toast.makeText(this,"Can't get alarm data", Toast.LENGTH_LONG);
 
 
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallbackForAlarmItem = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getAdapterPosition();
-                switch (direction) {
-                    case ItemTouchHelper.LEFT:
-                        new AlertDialog.Builder(Main.this).setTitle("Delete alarm")
-                                .setMessage("Delete this alarm ?")
-                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        alarm_adapter.notifyItemChanged(position);
-                                        dialog.cancel();
-                                    }
-                                })
-                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        DataStore.getInstance(Main.this).worldClockListQuery().deleteWorldClock(listAlarm.get(position).getID());
-                                        listAlarm.detete(position);
-                                        alarm_adapter.notifyItemChanged(position);
-                                    }
-                                })
-                                .create().show();
-                }
-            }
-
-            @Override
-            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-
-                    View itemView = viewHolder.itemView;
-                    int height = itemView.getBottom() - itemView.getTop();
-                    int width = height / 3;
-                    if (dX < 0) {
-                        Paint p = new Paint();
-                        p.setColor(Color.RED);
-                        RectF background = new RectF((float) itemView.getRight() + dX, (float) itemView.getTop(), (float) itemView.getRight(), (float) itemView.getBottom());
-                        c.drawRect(background, p);
-                        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.delete);
-                        float margin = (dX / 5 - width) / 2;
-                        RectF iconDest = new RectF((float) itemView.getRight() + margin, (float) itemView.getTop() + width, (float) itemView.getRight() + (margin + width), (float) itemView.getBottom() - width);
-                        c.drawBitmap(icon, null, iconDest, p);
-
-                    }
-
-
-                } else {
-                    c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-                }
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-            }
-
-            @Override
-            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder holder) {
-                int position = holder.getAdapterPosition();
-                int dragFlags = 0; // whatever your dragFlags need to be
-                int swipeFlags = createSwipeFlags(position);
-
-                return makeMovementFlags(dragFlags, swipeFlags);
-            }
-
-            private int createSwipeFlags(int position) {
-                return position == 0 ? 0 : ItemTouchHelper.LEFT;
-            }
-        };
-
-        ItemTouchHelper itemTouchHelperForAlarmItem = new ItemTouchHelper(simpleItemTouchCallbackForAlarmItem );
-        itemTouchHelperForAlarmItem.attachToRecyclerView(showAlarm);
-
     }
 
     @Override
@@ -690,6 +615,38 @@ public class Main extends AppCompatActivity implements Serializable {
      * -------------------------------------------------------------------------------------
      *-------------------------------MENU FUNCTION-------------------------------------------
      */
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.add_worldClockmenu:
+                openAddworldClockWindow(this);
+                return true;
+            //Alarm-------------------------------------
+            case R.id.add_Alarm:
+                openAddAlarmWindow(this);
+                return true;
+            case R.id.alarm_edit_menu:
+                EditAlarm(this);
+                return true;
+            case R.id.DeleteSecletedAlarm:
+                DeleteAlarmSelected(this);
+                return true;
+            case R.id.alarm_delete_all:
+                DeleteAllAlarm(this);
+                return true;
+            //World Clock------------------------------------
+            case R.id.world_clock_delete_all:
+                DeleteAllWorldClock(this);
+            case R.id.world_clock_edit:
+                EditWorldClock(this);
+                return true;
+            case R.id.DeleteSecletedWorldClock:
+                DeleteWorldClockSelected(this);
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     private void TimerMenu() {
         menuToChoose = R.menu.timer;
         invalidateOptionsMenu();
@@ -725,61 +682,36 @@ public class Main extends AppCompatActivity implements Serializable {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.add_worldClockmenu:
-                openAddworldClockWindow(this);
-                return true;
-                //Alarm-------------------------------------
-            case R.id.add_Alarm:
-                openAddAlarmWindow(this);
-                return true;
-            case R.id.alarm_edit_menu:
-                EditAlarm(this);
-                return true;
-            case R.id.DeleteSecletedAlarm:
-                DeleteAlarmSelected(this);
-                return true;
-            //World Clock------------------------------------
-            case R.id.world_clock_edit:
-                EditWorldClock(this);
-                return true;
-            case R.id.DeleteSecletedWorldClock:
-                DeleteWorldClockSelected(this);
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
-    private void WorldClockMenuChange(Menu menu){
+
+
+    private void WorldClockMenuReset(Menu menu){
         MenuItem delete = menu.findItem(R.id.DeleteSecletedWorldClock);
         MenuItem edit = menu.findItem(R.id.world_clock_edit);
+        MenuItem deleteAll = menu.findItem(R.id.world_clock_delete_all);
 
 
         if(delete.isVisible()){
             delete.setVisible(false);
             edit.setVisible(true);
         }
-        else{
-            delete.setVisible(true);
-            edit.setVisible(false);
-        }
+
+        deleteAll.setVisible(false);
+
     }
 
-    private void AlarmMenuChange(Menu menu){
+    private void AlarmMenuReset(Menu menu){
         MenuItem delete = menu.findItem(R.id.DeleteSecletedAlarm);
         MenuItem edit = menu.findItem(R.id.alarm_edit_menu);
+        MenuItem deleteAll = menu.findItem(R.id.alarm_delete_all);
 
 
         if(delete.isVisible()){
             delete.setVisible(false);
             edit.setVisible(true);
         }
-        else{
-            delete.setVisible(true);
-            edit.setVisible(false);
-        }
+        deleteAll.setVisible(false);
+
     }
 
     /**
@@ -834,6 +766,7 @@ public class Main extends AppCompatActivity implements Serializable {
                 alarmTime.show();
             }
         });
+
 
 
         //-----SETUP REPEATE DAY-----------------
@@ -914,6 +847,45 @@ public class Main extends AppCompatActivity implements Serializable {
         });
         //-----------------SETUP TITTLE-------------
         EditText Almtitle = sheetview.findViewById(R.id.alarm_tittle_choosed);
+        Almtitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Dialog dialog = new Dialog(v.getContext());
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.settitle_dialog);
+
+                Window window = dialog.getWindow();
+
+                if(window!= null){
+                    window.setLayout(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.WRAP_CONTENT);
+                    window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    WindowManager.LayoutParams windowAttribute  = window.getAttributes();
+                    windowAttribute.gravity = Gravity.CENTER;
+                    window.setAttributes(windowAttribute);
+
+                    //Save title
+                    EditText inputTittle = dialog.findViewById(R.id.alarm_settittle_title);
+                    inputTittle.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            inputTittle.setHint("");
+                            inputTittle.setFocusable(true);
+                        }
+                    });
+
+                    dialog.findViewById(R.id.alarm_settittle_savetitle).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Alarm_title = inputTittle.getText().toString();
+                            Almtitle.setText(Alarm_title);
+                            dialog.dismiss();
+                        }
+                    });
+                }
+
+                dialog.show();
+            }
+        });
 
         //-----------------------------------------------------------------------------
 
@@ -963,6 +935,7 @@ public class Main extends AppCompatActivity implements Serializable {
                 DataStore.getInstance(this).alarmListQuery().deleteAlarmByID(data.getID());
                 EditAlarm(context);
                 alarm_adapter.notifyDataSetChanged();
+                AlarmMenuReset(optionsMenu);
             }
         }
 
@@ -972,6 +945,46 @@ public class Main extends AppCompatActivity implements Serializable {
         SendUpdateAlarmData.putExtra("UpdateData",listAlarm);
         sendBroadcast(SendUpdateAlarmData);
     }
+
+    private void DeleteAllAlarm(Context context){
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+        dialog.setTitle("Delete All Clock")
+                .setMessage("Do you want to delete all ?")
+                .setIcon(R.drawable.ic_baseline_delete_forever_24)
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        listAlarm.deleteAll();
+                        DataStore.getInstance(context).alarmListQuery().deleteAllAlarm();
+                        EditAlarm(context);
+                        alarm_adapter.notifyDataSetChanged();
+                        AlarmMenuReset(optionsMenu);
+
+
+                        Intent SendUpdateAlarmData = new Intent();
+                        SendUpdateAlarmData.setAction("com.example.watchtime.source.ui.Alarm");
+                        SendUpdateAlarmData.putExtra(global_variable.AlarmProcessRequest,"isUpdateAlarm");
+                        SendUpdateAlarmData.putExtra("UpdateData",listAlarm);
+                        sendBroadcast(SendUpdateAlarmData);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        AlertDialog dl = dialog.create();
+        dl.getButton(DialogInterface.BUTTON_POSITIVE).setBackgroundColor(Color.parseColor("#E42B2B"));
+        dl.getButton(DialogInterface.BUTTON_NEGATIVE).setBackgroundColor(Color.parseColor("#171717"));
+        dl.show();
+
+
+        //Button negativeButton =   dialog
+
+    }
+
 
     private void EditAlarm(Context context) {
         if(alarm_adapter != null){
@@ -999,6 +1012,13 @@ public class Main extends AppCompatActivity implements Serializable {
                 }
             }
         }
+
+        MenuItem DeleteAllButton = optionsMenu.findItem(R.id.alarm_delete_all);
+        if(DeleteAllButton.isVisible()){
+            DeleteAllButton.setVisible(false);
+        }
+        else
+            DeleteAllButton.setVisible(true);
     }
 
     //------------------------------------------LAYOUT CHANGE------------------------------------
@@ -1105,11 +1125,13 @@ public class Main extends AppCompatActivity implements Serializable {
         stopService(new Intent(this, global_variable.worldClockService));
     }
 
+
+
     private void EditWorldClock(Context context){
         if(world_clock_adapter != null){
             for(int position = 0 ; position < worldClock_data.size();position++) {
                 View WorldClockCheck = showWorldClock.getLayoutManager().findViewByPosition(position);
-                CheckBox WorldClock_checked = WorldClockCheck.findViewById(R.id.Alarm_isChecked);
+                CheckBox WorldClock_checked = WorldClockCheck.findViewById(R.id.choosed_worldClock);
                 if(WorldClock_checked.getVisibility() == View.GONE){
                     WorldClock_checked.setVisibility(View.VISIBLE);
                 }
@@ -1117,21 +1139,53 @@ public class Main extends AppCompatActivity implements Serializable {
                     WorldClock_checked.setVisibility(View.GONE);
             }
         }
+
+
+        MenuItem DeleteAllButton = optionsMenu.findItem(R.id.world_clock_delete_all);
+        if(DeleteAllButton.isVisible()){
+            DeleteAllButton.setVisible(false);
+        }
+        else
+            DeleteAllButton.setVisible(true);
     }
 
     private void  DeleteWorldClockSelected(Context context){
         for(int position = 0 ; position < worldClock_data.size();position++) {
             View WorldClockCheck = showWorldClock.getLayoutManager().findViewByPosition(position);
-            CheckBox WorldClock_checked = WorldClockCheck.findViewById(R.id.Alarm_isChecked);
+            CheckBox WorldClock_checked = WorldClockCheck.findViewById(R.id.choosed_worldClock);
             if(WorldClock_checked.isChecked()){
                 DataStore.getInstance(context).worldClockListQuery().deleteWorldClock(worldClock_data.get(position).getID());
                 worldClock_data.remove(position);
                 EditWorldClock(context);
                 world_clock_adapter.notifyDataSetChanged();
-                WorldClockMenuChange(optionsMenu);
+                WorldClockMenuReset(optionsMenu);
             }
 
         }
+    }
+
+    private void DeleteAllWorldClock(Context context){
+        AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+        dialog.setTitle("Delete All Clock")
+                .setMessage("Do you want to delete all ?")
+                .setIcon(R.drawable.ic_baseline_delete_forever_24)
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DataStore.getInstance(context).worldClockListQuery().deleteAllWorldClock();
+                        worldClock_data.removeAll();
+                        EditWorldClock(context);
+                        world_clock_adapter.notifyDataSetChanged();
+                        WorldClockMenuReset(optionsMenu);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create().show();
     }
 
     private void openAddworldClockWindow(Context main) {

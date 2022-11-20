@@ -20,6 +20,10 @@ public class AlarmList implements Serializable {
         }
     }
 
+    public TreeMap getData(){
+        return alarmList;
+    }
+
     public AlarmList(Alarm alarm){
         this.alarmList.put(mergeMinuteAndHourForCheck(alarm),alarm);
     }
@@ -105,6 +109,19 @@ public class AlarmList implements Serializable {
             this.alarmList.remove(this.getKey(position));
             return true;
         }
+    }
+
+    public boolean deleteAll(){
+        alarmList.clear();
+        return true;
+    }
+
+    public boolean isEmpty(){
+        if(alarmList.size() == 0){
+            return true;
+        }
+        else
+            return false;
     }
 
     public void detete(Alarm delete) {

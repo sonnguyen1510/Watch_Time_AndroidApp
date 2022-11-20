@@ -104,6 +104,7 @@
                 android:layout_marginBottom="25dp"
                 android:background="@drawable/settime_button"
                 android:text="Set Time"
+                android:textColor="@color/white"
                 app:backgroundTint="@null"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -192,19 +193,20 @@
                     >
                 </EditText>
             </com.google.android.material.textfield.TextInputLayout>
+
             <TextView
                 android:id="@+id/DeleteAlarm"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
-                android:text="Delete Alarm"
-                android:visibility="gone"
-                android:textColor="#F86969"
-                android:background="#DCD9D9"
-                android:textAlignment="gravity"
-                android:gravity="center_vertical|center_horizontal"
                 android:layout_marginTop="30dp"
                 android:layout_marginBottom="30dp"
-                android:textSize="19dp"></TextView>
+                android:background="#DCD9D9"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="Delete Alarm"
+                android:textAlignment="gravity"
+                android:textColor="#F86969"
+                android:textSize="19dp"
+                android:visibility="gone"></TextView>
         </LinearLayout>
 
     </LinearLayout>

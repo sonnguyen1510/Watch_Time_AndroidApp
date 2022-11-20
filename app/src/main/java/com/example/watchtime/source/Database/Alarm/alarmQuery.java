@@ -19,4 +19,7 @@ public interface alarmQuery {
 
     @Query("DELETE FROM Alarm where ID = :ID")
     void deleteAlarmByID(int ID);
+
+    @Query("DELETE FROM Alarm")
+    void deleteAllAlarm();
 }

@@ -50,7 +50,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
                 android:text="Select"
-                android:textColor="#6DBF32"
+                android:textColor="#353535"
                 android:background="#EDEDED"
                 android:textAlignment="gravity"
                 android:gravity="center_vertical|center_horizontal"

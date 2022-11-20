@@ -2,9 +2,10 @@ package com.example.watchtime.source.Object;
 
 import com.example.watchtime.source.GlobalData.function;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Time {
+public class Time implements Serializable {
     public int hour ;
     public int minute;
     public int second;
@@ -93,6 +94,6 @@ public class Time {
     }
 
     public Time getTime() {
-        return this;
+        return new Time(this.hour,this.minute,this.second);
     }
 }

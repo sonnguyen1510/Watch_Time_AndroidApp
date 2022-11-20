@@ -22,4 +22,7 @@ public interface worldClockListQuery {
 
     @Query("DELETE FROM worldClockList WHERE id =:id")
     void deleteWorldClock(int id);
+
+    @Query("DELETE FROM worldClockList")
+    void deleteAllWorldClock();
 }

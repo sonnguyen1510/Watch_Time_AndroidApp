@@ -54,6 +54,19 @@ public class WorldClockList implements Serializable {
         return data.size();
     }
 
+    public boolean removeAll(){
+        data.removeAll(data);
+        return true;
+    }
+
+    public boolean isEmpty(){
+     if(data.size() == 0){
+         return true;
+     }
+     else
+         return false;
+    }
+
     public void add(worldClockList newWorldClock) {
         this.data.add(newWorldClock);
     }

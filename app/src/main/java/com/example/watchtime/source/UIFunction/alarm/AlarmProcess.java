@@ -1,5 +1,7 @@
 package com.example.watchtime.source.UIFunction.alarm;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,9 +9,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.example.watchtime.R;
 import com.example.watchtime.source.Database.Alarm.Alarm;
 import com.example.watchtime.source.GlobalData.global_variable;
 import com.example.watchtime.source.Object.AlarmList;
@@ -33,7 +37,15 @@ public class AlarmProcess extends Service{
             if(action.equalsIgnoreCase("isUpdateAlarm")){
                 Date current = Calendar.getInstance().getTime();
                 data = (AlarmList) intent.getSerializableExtra("UpdateData");
-                nextAlarm = data.getClosestAlarmHigh(current.getHours(),current.getMinutes());
+                if(data.isEmpty()){
+                    onDestroy();
+                    Log.e("No alarm","");
+                }
+                else{
+                    nextAlarm = data.getClosestAlarmHigh(current.getHours(),current.getMinutes());
+                    Log.e("Update alarm","");
+                }
+
 
             }else if(action.equalsIgnoreCase("UpdateState")){
                 //int ID = (Alarm) intent.getSerializableExtra(global_variable.AlarmData);
@@ -84,8 +96,10 @@ public class AlarmProcess extends Service{
                             nextAlarm = data.getClosestAlarmHigh(currentTime.getHours(),currentTime.getMinutes());
                         }
                     }else{
-                        if(mediaPlayer.isPlaying()){
-                            mediaPlayer.stop();
+                        if(mediaPlayer != null){
+                            if(mediaPlayer.isPlaying()){
+                                mediaPlayer.stop();
+                            }
                         }
                     }
                 }
@@ -95,10 +109,30 @@ public class AlarmProcess extends Service{
 
         return super.onStartCommand(intent, flags, startId);
     }
+    //-------------------------------NOTIFICATION--------------------------------------
+    private Notification getMyActivityNotification(String text){
+        // The PendingIntent to launch our activity if the user selects
+        // this notification
+
+        PendingIntent contentIntent = PendingIntent.getActivity(this,
+                0, new Intent(this, global_variable.Timer_activity), 0);
+
+        PendingIntent stopTimer = PendingIntent.getService(this,0,new Intent(this,global_variable.TimerService),0 );
+
+        return new Notification.Builder(this)
+                .setContentTitle("Alarm")
+                .setContentText(text)
+                .setSmallIcon(R.drawable.img)
+                .setContentIntent(contentIntent)
+                .addAction(R.drawable.ic_baseline_timer_red, "Stop",stopTimer)
+                .getNotification()
+                ;
+    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.e("Alarm","Destroy");
     }
     private void alert(int alertsong) {
         mediaPlayer = MediaPlayer.create(getApplicationContext(), alertsong);

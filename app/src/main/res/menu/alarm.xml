@@ -7,6 +7,13 @@
         app:showAsAction="always"
         android:icon="@drawable/ic_baseline_add_alert_24"
         />
+    <item
+        android:title="Delete all"
+        app:showAsAction="always"
+        android:id="@+id/alarm_delete_all"
+        android:visible="false"
+        />
+
     <item android:id="@+id/alarm_edit_menu"
         app:showAsAction="always"
         android:title="Edit"
