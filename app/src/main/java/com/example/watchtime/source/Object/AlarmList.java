@@ -12,11 +12,11 @@ import java.util.Set;
 import java.util.TreeMap;
 
 public class AlarmList implements Serializable {
-    private TreeMap<Integer,Alarm> alarmList = new TreeMap<>();
+    private TreeMap<Integer,List<Alarm>> alarmList = new TreeMap<>();
 
     public AlarmList(List<Alarm> alarmList) {
         for( Alarm i : alarmList){
-            this.alarmList.put(mergeMinuteAndHourForCheck(i),i);
+            this.addNewAlarm(i);
         }
     }
 
@@ -25,24 +25,34 @@ public class AlarmList implements Serializable {
     }
 
     public AlarmList(Alarm alarm){
-        this.alarmList.put(mergeMinuteAndHourForCheck(alarm),alarm);
+        this.addNewAlarm(alarm);
     }
 
+
     public void addNewAlarm (Alarm alarm){
-        this.alarmList.put(mergeMinuteAndHourForCheck(alarm),alarm);
+        if(alarmList.get(mergeMinuteAndHourForCheck(alarm)) == null){
+            List<Alarm> newAlarm = new ArrayList<>();
+            newAlarm.add(alarm);
+            this.alarmList.put(mergeMinuteAndHourForCheck(alarm),newAlarm);
+        }
+        else{
+            List<Alarm> alarmList = this.alarmList.get(mergeMinuteAndHourForCheck(alarm));
+            alarmList.add(alarm);
+            this.alarmList.put(mergeMinuteAndHourForCheck(alarm),alarmList);
+        }
 
     }
 
     public void addNewAlarm (List<Alarm> alarmList){
         for( Alarm i : alarmList){
-            this.alarmList.put(mergeMinuteAndHourForCheck(i),i);
+            this.addNewAlarm(i);
         }
     }
 
     public Alarm getClosestAlarm(Date date){
         int key = mergeMinuteAndHourForCheck(date);
-        Map.Entry<Integer, Alarm> low = alarmList.floorEntry(key);
-        Map.Entry<Integer, Alarm> high = alarmList.ceilingEntry(key);
+        Map.Entry<Integer, List<Alarm>> low = alarmList.floorEntry(key);
+        Map.Entry<Integer, List<Alarm>> high = alarmList.ceilingEntry(key);
         Object res = null;
         if (low != null && high != null) {
             res = Math.abs(key-low.getKey()) < Math.abs(key-high.getKey()) ? low.getValue() : high.getValue();
@@ -53,9 +63,13 @@ public class AlarmList implements Serializable {
         return (Alarm) res;
     }
 
-    public Alarm getClosestAlarmHigh(int hour , int minute){
+    public List<Alarm> getClosestAlarmHigh(int hour , int minute){
         int key = mergeMinuteAndHourForCheck(hour ,minute);
-        return alarmList.ceilingEntry(key).getValue();
+        Map.Entry<Integer, List<Alarm>> high = alarmList.ceilingEntry(key);
+        if(high == null){
+            return this.getByPosition(0);
+        }else
+            return high.getValue();
     }
 
     private int mergeMinuteAndHourForCheck(Alarm alarm){
@@ -89,8 +103,8 @@ public class AlarmList implements Serializable {
         return Integer.parseInt(String.valueOf(hour)+minutes);
     }
 
-    public Alarm get(int position) {
-        return (Alarm) alarmList.values().toArray()[position];
+    public List<Alarm> getByPosition(int position) {
+        return (List<Alarm>) alarmList.values().toArray()[position];
     }
 
     public int getKey(int position){
@@ -125,6 +139,41 @@ public class AlarmList implements Serializable {
     }
 
     public void detete(Alarm delete) {
-        this.alarmList.remove(this.mergeMinuteAndHourForCheck(delete));
+        int key = this.mergeMinuteAndHourForCheck(delete);
+        List<Alarm> value = alarmList.get(key);
+        if(value != null){
+            for (int position = 0 ; position < value.size() ; position++){
+                if(delete.getID() == value.get(position).getID()){
+                    value.remove(position);
+                }
+            }
+            this.alarmList.put(key,value);
+        }
+
     }
+
+    public void update(Alarm updateAlarm) {
+        int key = this.mergeMinuteAndHourForCheck(updateAlarm);
+        List<Alarm> value = alarmList.get(key);
+        if(value != null){
+            for (int position = 0 ; position < value.size() ; position++){
+                if(updateAlarm.getID() == value.get(position).getID()){
+                    value.set(position,updateAlarm);
+                }
+            }
+            this.alarmList.put(key,value);
+        }
+    }
+
+    public List<Alarm> toListAlarm() {
+        List<Alarm> result = new ArrayList<>();
+        for ( int i = 0 ; i < alarmList.size();i++){
+            List<Alarm> temp = this.getByPosition(i);
+           for(Alarm j : temp){
+               result.add(j);
+           }
+        }
+        return result;
+    }
+
 }

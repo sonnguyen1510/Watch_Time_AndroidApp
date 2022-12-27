@@ -200,11 +200,11 @@
                 android:layout_height="45dp"
                 android:layout_marginTop="30dp"
                 android:layout_marginBottom="30dp"
-                android:background="#DCD9D9"
+                android:background="#EDEDED"
                 android:gravity="center_vertical|center_horizontal"
                 android:text="Delete Alarm"
                 android:textAlignment="gravity"
-                android:textColor="#F86969"
+                android:textColor="#FF4F4F"
                 android:textSize="19dp"
                 android:visibility="gone"></TextView>
         </LinearLayout>

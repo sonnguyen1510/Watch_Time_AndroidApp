@@ -22,4 +22,7 @@ public interface alarmQuery {
 
     @Query("DELETE FROM Alarm")
     void deleteAllAlarm();
+
+    @Query("UPDATE Alarm SET isActive = :status WHERE ID = :ID")
+    void UpdateStatus(int ID , boolean status);
 }

@@ -1,6 +1,7 @@
 package com.example.watchtime.source.UIFunction.alarm;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -9,7 +10,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -21,18 +22,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,20 +43,22 @@ import com.example.watchtime.source.Database.DataStore;
 import com.example.watchtime.source.GlobalData.function;
 import com.example.watchtime.source.GlobalData.global_variable;
 import com.example.watchtime.source.Object.AlarmList;
-import com.example.watchtime.source.UI.Main;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
-    private AlarmList data ;
+    private List<Alarm> data  ;
     private Context context;
     private BottomSheetDialog EditAlarm;
+    public boolean EditedMode = false;
+    private List<Boolean> deleteList = new ArrayList<>();
 
-    public AlarmAdapter(AlarmList data , Context context) {
+    public AlarmAdapter(List<Alarm> data , Context context) {
         this.data = data;
         this.context = context;
     }
@@ -68,29 +70,50 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
 
         return new alarm(itemView);
     }
+    public List<Alarm> DeleteItemSelected(){
+        List<Alarm> alarmRemove = new ArrayList<>();
+        for (int i = 0 ; i<deleteList.size() ; i++){
+            if(deleteList.get(i) == true){
+                Alarm DeleteAlarm = data.get(i);
+                data.remove(i);
+                deleteList.remove(i);
+                alarmRemove.add(DeleteAlarm);
+                DataStore.getInstance(context).alarmListQuery().deleteAlarmByID(DeleteAlarm.getID());
+                i--;
+            }
+        }
+
+        Intent SendUpdateAlarmData = new Intent();
+        SendUpdateAlarmData.setAction("com.example.watchtime.source.ui.Alarm");
+        SendUpdateAlarmData.putExtra(global_variable.AlarmProcessRequest,"Delete");
+        SendUpdateAlarmData.putExtra("DeleteData",(Serializable) alarmRemove);
+        context.sendBroadcast(SendUpdateAlarmData);
+
+        notifyDataSetChanged();
+        return data;
+    }
 
     @Override
     public void onBindViewHolder(@NonNull alarm holder, @SuppressLint("RecyclerView") int position) {
         Alarm alarmData = data.get(position);
-        if(alarmData.getHours() > 10 && alarmData.getMinutes() >10){
+        deleteList.add(false);
+
+        if(alarmData.getHours() >= 10 && alarmData.getMinutes() >=10){
             holder.time.setText(alarmData.getHours() + ":"+alarmData.getMinutes());
         }else{
-            if(alarmData.getHours() <10 && alarmData.getMinutes() >10){
-                holder.time.setText("0"+alarmData.getHours() + ":"+alarmData.getMinutes());
+            if(alarmData.getHours() <10 && alarmData.getMinutes() <10){
+                holder.time.setText("0"+alarmData.getHours() + ":0"+alarmData.getMinutes());
             }
-            else if (alarmData.getHours() >10 && alarmData.getMinutes() <10){
+            else if (alarmData.getHours() >=10 && alarmData.getMinutes() <10){
                 holder.time.setText(alarmData.getHours() + ":0"+alarmData.getMinutes());
             }
             else {
-                holder.time.setText("0"+alarmData.getHours() + ":0"+alarmData.getMinutes());
+                holder.time.setText("0"+alarmData.getHours() + ":"+alarmData.getMinutes());
             }
         }
 
         holder.tittle.setText(alarmData.getTittle() +"");
-        holder.activeAlarm.setChecked(alarmData.isActive());
-        if(holder.activeAlarm.isChecked()){
 
-        }
         String DayRepeat = alarmData.getDayactive();
         //Day repeat
         if(DayRepeat!=null){
@@ -169,28 +192,18 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
                 TextView title = sheetview.findViewById(R.id.alarm_function_title);
                 title.setText("");
                 //-----SETUP TIME-----------------
-
+                TextView showTime =sheetview.findViewById(R.id.ShowAlarmTime);
+                showTime.setText(function.Timer.FormatTime(alarmData.getHours(),alarmData.getMinutes()));
                 sheetview.findViewById(R.id.alarm_timeSetting).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        TextView showTime =sheetview.findViewById(R.id.ShowAlarmTime);
-                        if(alarmData.getMinutes() < 10){
-                            showTime.setText(alarmData.getHours()+":0"+alarmData.getMinutes());
-                        }
-                        else
-                            showTime.setText(alarmData.getHours()+":"+alarmData.getMinutes());
-
                         TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                                 newAlarm.setHours(hourOfDay);
                                 newAlarm.setMinutes(minute);
+                                showTime.setText(function.Timer.FormatTime(alarmData.getHours(),alarmData.getMinutes()));
 
-                                if(minute < 10){
-                                    showTime.setText(newAlarm.getHours()+":0"+newAlarm.getMinutes());
-                                }
-                                else
-                                    showTime.setText(+newAlarm.getHours()+":"+newAlarm.getMinutes());
                             }
                         };
                         TimePickerDialog alarmTime = new TimePickerDialog(v.getContext(),onTimeSetListener,newAlarm.getHours(),newAlarm.getMinutes(),true);
@@ -263,7 +276,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
 
                 //-----SETUP DROPDOWN ALERT SONG MENU--------------
                 AutoCompleteTextView alertsongChoosed = sheetview.findViewById(R.id.alarm_sound_choosed);
-                alertsongChoosed.setText(alarmData.getAlertsong());
+                alertsongChoosed.setText(context.getResources().getResourceEntryName(alarmData.getAlertsong()));
                 int Alarm_Sound;
 
                 List<String> ListSong = DataStore.getInstance(context).alertSongQuery().getAllAlertsong();
@@ -282,6 +295,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
                 });
                 //-----------------SETUP TITTLE-------------
                 EditText Almtitle = sheetview.findViewById(R.id.alarm_tittle_choosed);
+                Almtitle.setText(alarmData.getTittle());
                 Almtitle.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -292,7 +306,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
                         Window window = dialog.getWindow();
 
                         if(window!= null){
-                            window.setLayout(WindowManager.LayoutParams.WRAP_CONTENT,WindowManager.LayoutParams.WRAP_CONTENT);
+                            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.WRAP_CONTENT);
                             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                             WindowManager.LayoutParams windowAttribute  = window.getAttributes();
                             windowAttribute.gravity = Gravity.CENTER;
@@ -313,22 +327,56 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
                         dialog.show();
                     }
                 });
-                //-----------------------------------------------------------------------------
+                //----------------------------------SAVE-------------------------------------------
 
                 sheetview.findViewById(R.id.add_Alarm_Save).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Log.e("Save","Save alarm");
+                        Log.e("Save","Updated alarm");
                         //Delete old alarm
                         DataStore.getInstance(sheetview.getContext()).alarmListQuery().deleteAlarmByID(alarmData.getID());
-                        data.detete(position);
-
                         DataStore.getInstance(sheetview.getContext()).alarmListQuery().createNewAlarm(newAlarm);
+                        data.set(position,newAlarm);
                         notifyDataSetChanged();
-                        //Log.e("Time",Alarm_hour+" "+Alarm_minutes);
-                        //listAlarm.addNewAlarm(newAlarm);
-                        //alarm_adapter.notifyDataSetChanged();
                         EditAlarm.dismiss();
+
+                        //Update
+                        Intent SendTimeData = new Intent();
+                        SendTimeData.setAction("com.example.watchtime.source.ui.Time");
+                        SendTimeData.putExtra(global_variable.Request,"UpdateAlarm");
+                        SendTimeData.putExtra("Position",position);
+                        SendTimeData.putExtra("Update",(Serializable) data.get(position));
+                    }
+                });
+                //----------------------------------DELETE-----------------------------------
+                sheetview.findViewById(R.id.DeleteAlarm).setVisibility(View.VISIBLE);
+                sheetview.findViewById(R.id.DeleteAlarm).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                        builder.setTitle("Delete Alarm")
+                                .setMessage("Do you want to delete this alarm ?")
+                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent SendTimeData = new Intent();
+                                        SendTimeData.setAction("com.example.watchtime.source.ui.Time");
+                                        SendTimeData.putExtra(global_variable.Request,"DeleteAlarm");
+                                        SendTimeData.putExtra("Position",position);
+                                        SendTimeData.putExtra("Delete",(Serializable) alarmData);
+                                        v.getContext().sendBroadcast(SendTimeData);
+                                        EditAlarm.dismiss();
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                })
+                                .setIcon(v.getResources().getDrawable(R.drawable.ic_baseline_delete_forever_24))
+                                .create()
+                                .show();
                     }
                 });
 
@@ -346,38 +394,53 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
 
             }
         });
+        holder.activeAlarm.setChecked(alarmData.isActive());
 
-        /*
-        holder.deleteAlarm.setOnClickListener(new View.OnClickListener() {
+        holder.activeAlarm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                builder.setTitle("Delete Alarm")
-                        .setMessage("Do you want to delete this alarm ?")
-                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent SendTimeData = new Intent();
-                                SendTimeData.setAction("com.example.watchtime.source.ui.Time");
-                                SendTimeData.putExtra(global_variable.Request,"DeleteAlarm");
-                                SendTimeData.putExtra("AlarmID",alarmData.getID());
-                                SendTimeData.putExtra("Delete",(Serializable) alarmData);
-                                v.getContext().sendBroadcast(SendTimeData);
-                                EditAlarm.dismiss();
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .setIcon(v.getResources().getDrawable(R.drawable.ic_baseline_delete_forever_24))
-                        .create()
-                        .show();
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Alarm updateAlarm = alarmData;
+                updateAlarm.setActive(isChecked);
+                //Update in service
+                Intent SendUpdateAlarmData = new Intent();
+                SendUpdateAlarmData.setAction("com.example.watchtime.source.ui.Alarm");
+                SendUpdateAlarmData.putExtra(global_variable.AlarmProcessRequest,"UpdateStatus");
+                SendUpdateAlarmData.putExtra("Status",isChecked);
+                SendUpdateAlarmData.putExtra("Alarm",(Serializable) alarmData);
+                context.sendBroadcast(SendUpdateAlarmData);
+
+                //Update in DB
+                DataStore.getInstance(context).alarmListQuery().UpdateStatus(alarmData.getID(),isChecked);
             }
         });
-        * */
+
+        holder.AlarmCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    deleteList.set(position,true);
+                }
+                else {
+                    deleteList.set(position,false);
+                }
+            }
+        });
+
+
+        if (EditedMode == false){
+            holder.AlarmCheck.setChecked(false);
+            holder.AlarmCheck.setVisibility(View.GONE);
+            holder.Edit_Alarm.setVisibility(View.GONE);
+            holder.activeAlarm.setVisibility(View.VISIBLE);
+        }
+        else {
+            holder.AlarmCheck.setVisibility(View.VISIBLE);
+            holder.Edit_Alarm.setVisibility(View.VISIBLE);
+            holder.activeAlarm.setVisibility(View.GONE);
+        }
+
+
     }
     private void ChangeRepeat_dayActive(TextView textView){
         textView.setTextColor(Color.parseColor("#FFFFFF"));
@@ -398,6 +461,10 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
 
     }
 
+    public Alarm get(int position) {
+        return data.get(position);
+    }
+
     public class alarm extends RecyclerView.ViewHolder {
         public TextView time;
         public TextView tittle;
@@ -409,7 +476,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
         public TextView repeatFriday;
         public TextView repeatSaturday;
         public TextView repeatSunday;
-        public TextView deleteAlarm;
         public CheckBox AlarmCheck;
         public ImageView Edit_Alarm;
 
@@ -428,7 +494,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
             repeatSunday = itemView.findViewById(R.id.alarm_repeatSunday);
             AlarmCheck = itemView.findViewById(R.id.Alarm_isChecked);
             Edit_Alarm = itemView.findViewById(R.id.Edit_Alarm);
-            deleteAlarm = itemView.findViewById(R.id.DeleteAlarm);
 
             AlarmCheck.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -436,13 +501,19 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.alarm> {
                     Intent SendTimeData = new Intent();
                     SendTimeData.setAction("com.example.watchtime.source.ui.Time");
                     SendTimeData.putExtra(global_variable.Request,"updateAlarmMenu");
+                    SendTimeData.putExtra("NumberOfChecked",getNumofCheckedAlarm());
                     v.getContext().sendBroadcast(SendTimeData);
                 }
             });
-
-
-
-
         }
+    }
+
+    private int getNumofCheckedAlarm() {
+        for (boolean i : deleteList){
+            if(i){
+                return 1;
+            }
+        }
+        return 0;
     }
 }

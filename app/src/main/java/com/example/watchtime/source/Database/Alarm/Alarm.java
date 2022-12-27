@@ -36,6 +36,10 @@ public class Alarm implements Serializable {
         this.Dayactive = alarm.getDayactive();
     }
 
+    public Alarm() {
+
+    }
+
     public String getDayactive() {
         return Dayactive;
     }

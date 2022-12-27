@@ -67,6 +67,10 @@ public class WorldClockList implements Serializable {
          return false;
     }
 
+    public void UpdateWorldClockList(WorldClockList worldClockList){
+        this.data = worldClockList.data;
+    }
+
     public void add(worldClockList newWorldClock) {
         this.data.add(newWorldClock);
     }

@@ -35,8 +35,6 @@ public class world_clock_process extends Service {
                 try {
                     Time runTime = new Time(Calendar.getInstance().getTime());
                     while (!isInterrupted()) {
-
-
                         if(runTime.IsNextMinutes()){
                             Thread.sleep(1000);
                             UpdateTimeAlert(runTime.getTime());
@@ -45,7 +43,7 @@ public class world_clock_process extends Service {
                         else {
                             Thread.sleep(1000);
                         }
-                        Log.e("In world clock Thread",runTime.toStringTime());
+                        //Log.e("In world clock Thread",runTime.toStringTime());
 
                     }
                 } catch (InterruptedException e) {
