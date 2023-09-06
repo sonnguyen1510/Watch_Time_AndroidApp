@@ -1,6 +1,12 @@
+<a name="readme-top"></a>
 # Watch_Time_AndroidApp
 
-<p> implementation </p>
+
+<!-- ABOUT THE PROJECT -->
+### About The Project
+  
+<p name="implementation"> implementation </p>
+<pre><code>
   implementation 'androidx.appcompat:appcompat:1.4.2'
   implementation 'com.google.android.material:material:1.6.1'
   implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -19,3 +25,30 @@
   implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
   implementation "androidx.room:room-runtime:$room_version"
   annotationProcessor "androidx.room:room-compiler:$room_version"
+</code></pre>
+
+### Built With
+
+* [![Next][Next.js]][Next-url]
+* [![React][React.js]][React-url]
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+### Installation
+
+1. Clone the repo
+   ```sh
+   git clone https://github.com/your_username_/Project-Name.git
+   ```
+3. Implement library needed for this project (<a href="#implementation">Click here</a>) , check JDK , SDK version before run 
+   ```sh
+   npm install
+   ```
+4. Enter your API in `config.js`
+   ```js
+   const API_KEY = 'ENTER YOUR API';
+   ```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
