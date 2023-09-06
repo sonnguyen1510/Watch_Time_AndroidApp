@@ -1,11 +1,12 @@
 <a name="readme-top"></a>
-# Watch_Time_AndroidApp
-
+# Watch Time Android Application
+<img src="image/clockImage.png" alt="Logo" width="180" height="180">
 
 <!-- ABOUT THE PROJECT -->
 ### About The Project
-  
-<p name="implementation"> implementation </p>
+1. Description
+   
+2. Implementation <a name="implementation"></a>
 <pre><code>
   implementation 'androidx.appcompat:appcompat:1.4.2'
   implementation 'com.google.android.material:material:1.6.1'
@@ -29,8 +30,8 @@
 
 ### Built With
 
-* [![Next][Next.js]][Next-url]
-* [![React][React.js]][React-url]
+* ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+* ![SQLite](https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -38,16 +39,10 @@
 
 1. Clone the repo
    ```sh
-   git clone https://github.com/your_username_/Project-Name.git
+   git clone https://github.com/sonnguyen1510/Watch_Time_AndroidApp.git
    ```
-3. Implement library needed for this project (<a href="#implementation">Click here</a>) , check JDK , SDK version before run 
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
+2. Implement library needed for this project (<a href="#implementation">Click here</a>) , check JDK , SDK version before run 
+   
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
