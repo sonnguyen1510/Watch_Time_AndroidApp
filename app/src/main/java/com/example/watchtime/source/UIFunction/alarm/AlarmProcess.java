@@ -160,13 +160,13 @@ public class AlarmProcess extends Service{
         // this notification
 
         PendingIntent contentIntent = PendingIntent.getActivity(this,
-                0, new Intent(this, Main.class), 0);
+                0, new Intent(this, Main.class), PendingIntent.FLAG_IMMUTABLE);
 
         //PendingIntent stopAlarm = PendingIntent.getService(this,0,new Intent(this,global_variable.TimerService),0 );
         Intent intent = new Intent();
         intent.setAction("com.example.watchtime.source.ui.Alarm");
         intent.putExtra(global_variable.AlarmProcessRequest,"Update");
-        PendingIntent stopAlarm = PendingIntent.getBroadcast(this, 0, intent,0);
+        PendingIntent stopAlarm = PendingIntent.getBroadcast(this, 0, intent,PendingIntent.FLAG_IMMUTABLE);
 
 
         return new Notification.Builder(this)
